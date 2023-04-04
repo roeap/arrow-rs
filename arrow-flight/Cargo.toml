@@ -69,7 +69,7 @@ tower = "0.4.13"
 # (and checked in) arrow.flight.protocol.rs from changing
 proc-macro2 = { version = "=1.0.52", default-features = false }
 prost-build = { version = "=0.11.8", default-features = false }
-tonic-build = { version = "=0.8.4", default-features = false, features = ["transport", "prost"] }
+tonic-build = { version = "=0.9.1", default-features = false, features = ["transport", "prost"] }
 
 [[example]]
 name = "flight_sql_server"
