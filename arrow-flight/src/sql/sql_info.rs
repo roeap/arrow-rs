@@ -10,9 +10,14 @@ use arrow_array::RecordBatch;
 use arrow_data::ArrayData;
 use arrow_schema::{DataType, Field, Schema, UnionFields, UnionMode};
 use once_cell::sync::Lazy;
+use prost::Message;
 
-use super::SqlInfo;
+use super::{CommandGetSqlInfo, ProstMessageExt, SqlInfo};
 use crate::error::Result;
+use crate::{
+    flight_descriptor::DescriptorType, FlightDescriptor, FlightEndpoint, FlightInfo,
+    IpcMessage, IpcWriteOptions, SchemaAsIpc, Ticket,
+};
 
 /// Represents a dynamic value
 #[derive(Debug, Clone, PartialEq)]
@@ -93,7 +98,7 @@ impl SqlInfoName for u32 {
 /// * >
 /// ```
 ///[flightsql]: (https://github.com/apache/arrow/blob/f9324b79bf4fc1ec7e97b32e3cce16e75ef0f5e3/format/FlightSql.proto#L32-L43
-pub struct SqlInfoUnionBuilder {
+struct SqlInfoUnionBuilder {
     // Values for each child type
     string_values: StringBuilder,
     bool_values: BooleanBuilder,
@@ -295,14 +300,57 @@ impl SqlInfoList {
     }
 
     /// Return the schema for the record batches produced
-    pub fn schema(&self) -> &Schema {
+    pub fn schema() -> &'static Schema {
         // It is always the same
-        &SCHEMA
+        &SQL_INFO_SCHEMA
+    }
+
+    /// Return the [`FlightInfo`] for CommandSqlInfo
+    pub fn flight_info(
+        ticket: Option<Ticket>,
+        flight_descriptor: Option<FlightDescriptor>,
+    ) -> FlightInfo {
+        let options = IpcWriteOptions::default();
+
+        // encode the schema into the correct form
+        let IpcMessage(schema) = SchemaAsIpc::new(&SQL_INFO_SCHEMA, &options)
+            .try_into()
+            .expect("valid sql_info schema");
+
+        let ticket = ticket.unwrap_or_else(|| Ticket {
+            ticket: CommandGetSqlInfo::default().as_any().encode_to_vec().into(),
+        });
+
+        let endpoint = vec![FlightEndpoint {
+            ticket: Some(ticket),
+            // we assume users wnating to use this helper would reasonably
+            // never need to be distributed across multile endpoints?
+            location: vec![],
+        }];
+
+        let flight_descriptor = flight_descriptor.unwrap_or_else(|| FlightDescriptor {
+            r#type: DescriptorType::Cmd.into(),
+            cmd: CommandGetSqlInfo {
+                ..Default::default()
+            }
+            .encode_to_vec()
+            .into(),
+            ..Default::default()
+        });
+
+        FlightInfo {
+            schema,
+            flight_descriptor: Some(flight_descriptor),
+            endpoint,
+            total_records: -1,
+            total_bytes: -1,
+            ordered: false,
+        }
     }
 }
 
 // The schema produced by [`SqlInfoList`]
-static SCHEMA: Lazy<Schema> = Lazy::new(|| {
+static SQL_INFO_SCHEMA: Lazy<Schema> = Lazy::new(|| {
     Schema::new(vec![
         Field::new("info_name", DataType::UInt32, false),
         Field::new("value", SqlInfoUnionBuilder::schema().clone(), false),
