@@ -20,6 +20,7 @@ use base64::Engine;
 use futures::{stream, Stream, TryStreamExt};
 use once_cell::sync::Lazy;
 use prost::Message;
+use std::collections::HashSet;
 use std::pin::Pin;
 use std::sync::Arc;
 use tonic::transport::Server;
@@ -30,6 +31,10 @@ use arrow_array::builder::StringBuilder;
 use arrow_array::{ArrayRef, RecordBatch};
 use arrow_flight::encode::FlightDataEncoderBuilder;
 use arrow_flight::flight_descriptor::DescriptorType;
+use arrow_flight::sql::catalogs::{
+    get_catalogs_batch, get_catalogs_schema, get_db_schemas_schema, get_tables_schema,
+    GetSchemasBuilder, GetTablesBuilder,
+};
 use arrow_flight::sql::sql_info::SqlInfoList;
 use arrow_flight::sql::{
     server::FlightSqlService, ActionBeginSavepointRequest, ActionBeginSavepointResult,
@@ -72,6 +77,8 @@ static INSTANCE_SQL_INFO: Lazy<SqlInfoList> = Lazy::new(|| {
         // 1.3 comes from https://github.com/apache/arrow/blob/f9324b79bf4fc1ec7e97b32e3cce16e75ef0f5e3/format/Schema.fbs#L24
         .with_sql_info(SqlInfo::FlightSqlServerArrowVersion, "1.3")
 });
+
+static TABLES: Lazy<Vec<&'static str>> = Lazy::new(|| vec!["flight_sql.example.table"]);
 
 #[derive(Clone)]
 pub struct FlightSqlServiceImpl {}
@@ -248,32 +255,106 @@ impl FlightSqlService for FlightSqlServiceImpl {
 
     async fn get_flight_info_catalogs(
         &self,
-        _query: CommandGetCatalogs,
-        _request: Request<FlightDescriptor>,
+        query: CommandGetCatalogs,
+        request: Request<FlightDescriptor>,
     ) -> Result<Response<FlightInfo>, Status> {
-        Err(Status::unimplemented(
-            "get_flight_info_catalogs not implemented",
-        ))
+        let flight_descriptor = request.into_inner();
+        let ticket = Ticket {
+            ticket: query.encode_to_vec().into(),
+        };
+
+        let options = IpcWriteOptions::default();
+
+        // encode the schema into the correct form
+        let IpcMessage(schema) = SchemaAsIpc::new(get_catalogs_schema(), &options)
+            .try_into()
+            .expect("valid catalogs schema");
+
+        let endpoint = vec![FlightEndpoint {
+            ticket: Some(ticket),
+            location: vec![],
+        }];
+
+        let flight_info = FlightInfo {
+            schema,
+            flight_descriptor: Some(flight_descriptor),
+            endpoint,
+            total_records: -1,
+            total_bytes: -1,
+            ordered: false,
+        };
+
+        Ok(tonic::Response::new(flight_info))
     }
 
     async fn get_flight_info_schemas(
         &self,
-        _query: CommandGetDbSchemas,
-        _request: Request<FlightDescriptor>,
+        query: CommandGetDbSchemas,
+        request: Request<FlightDescriptor>,
     ) -> Result<Response<FlightInfo>, Status> {
-        Err(Status::unimplemented(
-            "get_flight_info_schemas not implemented",
-        ))
+        let flight_descriptor = request.into_inner();
+        let ticket = Ticket {
+            ticket: query.encode_to_vec().into(),
+        };
+
+        let options = IpcWriteOptions::default();
+
+        // encode the schema into the correct form
+        let IpcMessage(schema) =
+            SchemaAsIpc::new(get_db_schemas_schema().as_ref(), &options)
+                .try_into()
+                .expect("valid schemas schema");
+
+        let endpoint = vec![FlightEndpoint {
+            ticket: Some(ticket),
+            location: vec![],
+        }];
+
+        let flight_info = FlightInfo {
+            schema,
+            flight_descriptor: Some(flight_descriptor),
+            endpoint,
+            total_records: -1,
+            total_bytes: -1,
+            ordered: false,
+        };
+
+        Ok(tonic::Response::new(flight_info))
     }
 
     async fn get_flight_info_tables(
         &self,
-        _query: CommandGetTables,
-        _request: Request<FlightDescriptor>,
+        query: CommandGetTables,
+        request: Request<FlightDescriptor>,
     ) -> Result<Response<FlightInfo>, Status> {
-        Err(Status::unimplemented(
-            "get_flight_info_tables not implemented",
-        ))
+        let flight_descriptor = request.into_inner();
+        let ticket = Ticket {
+            ticket: query.encode_to_vec().into(),
+        };
+
+        let options = IpcWriteOptions::default();
+
+        // encode the schema into the correct form
+        let IpcMessage(schema) =
+            SchemaAsIpc::new(get_tables_schema(query.include_schema).as_ref(), &options)
+                .try_into()
+                .expect("valid tables schema");
+
+        let endpoint = vec![FlightEndpoint {
+            ticket: Some(ticket),
+            location: vec![],
+        }];
+
+        let flight_info = FlightInfo {
+            schema,
+            flight_descriptor: Some(flight_descriptor),
+            endpoint,
+            total_records: -1,
+            total_bytes: -1,
+            ordered: false,
+        };
+
+        Ok(tonic::Response::new(flight_info))
     }
 
     async fn get_flight_info_table_types(
@@ -396,23 +477,113 @@ impl FlightSqlService for FlightSqlServiceImpl {
         _query: CommandGetCatalogs,
         _request: Request<Ticket>,
     ) -> Result<Response<<Self as FlightService>::DoGetStream>, Status> {
-        Err(Status::unimplemented("do_get_catalogs not implemented"))
+        let catalog_names = TABLES
+            .iter()
+            .map(|full_name| full_name.split('.').collect::<Vec<_>>()[0].to_string())
+            .collect::<HashSet<_>>();
+        let batch = get_catalogs_batch(catalog_names.into_iter().collect());
+        let stream = FlightDataEncoderBuilder::new()
+            .with_schema(Arc::new(get_catalogs_schema().clone()))
+            .build(futures::stream::once(async { batch }))
+            .map_err(Status::from);
+        Ok(Response::new(Box::pin(stream)))
     }
 
     async fn do_get_schemas(
         &self,
-        _query: CommandGetDbSchemas,
+        query: CommandGetDbSchemas,
         _request: Request<Ticket>,
     ) -> Result<Response<<Self as FlightService>::DoGetStream>, Status> {
-        Err(Status::unimplemented("do_get_schemas not implemented"))
+        let schemas = TABLES
+            .iter()
+            .map(|full_name| {
+                let parts = full_name.split('.').collect::<Vec<_>>();
+                (parts[0].to_string(), parts[1].to_string())
+            })
+            .collect::<HashSet<_>>();
+
+        let mut builder = GetSchemasBuilder::new(query.db_schema_filter_pattern);
+        if let Some(catalog) = query.catalog {
+            for (catalog_name, schema_name) in schemas {
+                if catalog == catalog_name {
+                    builder
+                        .append(catalog_name, schema_name)
+                        .map_err(Status::from)?;
+                }
+            }
+        } else {
+            for (catalog_name, schema_name) in schemas {
+                builder
+                    .append(catalog_name, schema_name)
+                    .map_err(Status::from)?;
+            }
+        };
+
+        let batch = builder.build();
+        let stream = FlightDataEncoderBuilder::new()
+            .with_schema(get_db_schemas_schema())
+            .build(futures::stream::once(async { batch }))
+            .map_err(Status::from);
+        Ok(Response::new(Box::pin(stream)))
     }
 
     async fn do_get_tables(
         &self,
-        _query: CommandGetTables,
+        query: CommandGetTables,
         _request: Request<Ticket>,
     ) -> Result<Response<<Self as FlightService>::DoGetStream>, Status> {
-        Err(Status::unimplemented("do_get_tables not implemented"))
+        let tables = TABLES
+            .iter()
+            .map(|full_name| {
+                let parts = full_name.split('.').collect::<Vec<_>>();
+                (
+                    parts[0].to_string(),
+                    parts[1].to_string(),
+                    parts[2].to_string(),
+                )
+            })
+            .collect::<HashSet<_>>();
+
+        let mut builder = GetTablesBuilder::new(
+            query.db_schema_filter_pattern,
+            query.table_name_filter_pattern,
+            query.include_schema,
+        );
+        let dummy_schema = Schema::empty();
+        if let Some(catalog) = query.catalog {
+            for (catalog_name, schema_name, table_name) in tables {
+                if catalog == catalog_name {
+                    builder
+                        .append(
+                            catalog_name,
+                            schema_name,
+                            table_name,
+                            "TABLE",
+                            &dummy_schema,
+                        )
+                        .map_err(Status::from)?;
+                }
+            }
+        } else {
+            for (catalog_name, schema_name, table_name) in tables {
+                builder
+                    .append(
+                        catalog_name,
+                        schema_name,
+                        table_name,
+                        "TABLE",
+                        &dummy_schema,
+                    )
+                    .map_err(Status::from)?;
+            }
+        };
+
+        let batch = builder.build();
+        let stream = FlightDataEncoderBuilder::new()
+            .with_schema(get_db_schemas_schema())
+            .build(futures::stream::once(async { batch }))
+            .map_err(Status::from);
+        Ok(Response::new(Box::pin(stream)))
     }
 
     async fn do_get_table_types(
