@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["comparison","ord","partition","rank","sort"]};
+window.SIDEBAR_ITEMS = {"mod":["cmp","ord","partition","rank","sort"]};

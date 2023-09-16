@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-cb6f1f67f1bcd037.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (1b198b3a1 2023-08-13)" data-channel="nightly" data-search-js="search-6dfdfced5eff6596.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-1596385f77d47ef2.css" data-theme-dark-css="dark-0a43001d3fc2282c.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-1596385f77d47ef2.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-0a43001d3fc2282c.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ae1b282cda4c21ec.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (20999de3a 2023-09-15)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-74424d7eec62a23e.js" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-cabe4b1bd7b9da95.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8928,43 +8928,6 @@
 <a href="#8928" id="8928">8928</a>
 <a href="#8929" id="8929">8929</a>
 <a href="#8930" id="8930">8930</a>
-<a href="#8931" id="8931">8931</a>
-<a href="#8932" id="8932">8932</a>
-<a href="#8933" id="8933">8933</a>
-<a href="#8934" id="8934">8934</a>
-<a href="#8935" id="8935">8935</a>
-<a href="#8936" id="8936">8936</a>
-<a href="#8937" id="8937">8937</a>
-<a href="#8938" id="8938">8938</a>
-<a href="#8939" id="8939">8939</a>
-<a href="#8940" id="8940">8940</a>
-<a href="#8941" id="8941">8941</a>
-<a href="#8942" id="8942">8942</a>
-<a href="#8943" id="8943">8943</a>
-<a href="#8944" id="8944">8944</a>
-<a href="#8945" id="8945">8945</a>
-<a href="#8946" id="8946">8946</a>
-<a href="#8947" id="8947">8947</a>
-<a href="#8948" id="8948">8948</a>
-<a href="#8949" id="8949">8949</a>
-<a href="#8950" id="8950">8950</a>
-<a href="#8951" id="8951">8951</a>
-<a href="#8952" id="8952">8952</a>
-<a href="#8953" id="8953">8953</a>
-<a href="#8954" id="8954">8954</a>
-<a href="#8955" id="8955">8955</a>
-<a href="#8956" id="8956">8956</a>
-<a href="#8957" id="8957">8957</a>
-<a href="#8958" id="8958">8958</a>
-<a href="#8959" id="8959">8959</a>
-<a href="#8960" id="8960">8960</a>
-<a href="#8961" id="8961">8961</a>
-<a href="#8962" id="8962">8962</a>
-<a href="#8963" id="8963">8963</a>
-<a href="#8964" id="8964">8964</a>
-<a href="#8965" id="8965">8965</a>
-<a href="#8966" id="8966">8966</a>
-<a href="#8967" id="8967">8967</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9016,7 +8979,7 @@
 <span class="kw">use </span>arrow_array::{
     builder::<span class="kw-2">*</span>, cast::<span class="kw-2">*</span>, temporal_conversions::<span class="kw-2">*</span>, timezone::Tz, types::<span class="kw-2">*</span>, <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer, OffsetBuffer, ScalarBuffer};
+<span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer, OffsetBuffer};
 <span class="kw">use </span>arrow_data::ArrayData;
 <span class="kw">use </span>arrow_schema::<span class="kw-2">*</span>;
 <span class="kw">use </span>arrow_select::take::take;
@@ -11994,19 +11957,7 @@
 {
     <span class="kw">let </span>dict_array = array.as_dictionary::&lt;K&gt;();
     <span class="kw">let </span>cast_dict_values = cast_with_options(dict_array.values(), to_type, cast_options)<span class="question-mark">?</span>;
-    <span class="kw">let </span>keys = dict_array.keys();
-    <span class="kw">match </span>K::DATA_TYPE {
-        DataType::Int32 =&gt; {
-            <span class="comment">// Dictionary guarantees all non-null keys &gt;= 0
-            </span><span class="kw">let </span>buffer = ScalarBuffer::new(keys.values().inner().clone(), <span class="number">0</span>, keys.len());
-            <span class="kw">let </span>indices = PrimitiveArray::new(buffer, keys.nulls().cloned());
-            take::&lt;UInt32Type&gt;(cast_dict_values.as_ref(), <span class="kw-2">&amp;</span>indices, <span class="prelude-val">None</span>)
-        }
-        <span class="kw">_ </span>=&gt; {
-            <span class="kw">let </span>indices = cast_with_options(keys, <span class="kw-2">&amp;</span>DataType::UInt32, cast_options)<span class="question-mark">?</span>;
-            take::&lt;UInt32Type&gt;(cast_dict_values.as_ref(), indices.as_primitive(), <span class="prelude-val">None</span>)
-        }
-    }
+    take(cast_dict_values.as_ref(), dict_array.keys(), <span class="prelude-val">None</span>)
 }
 
 <span class="doccomment">/// Attempts to encode an array into an `ArrayDictionary` with index
@@ -12407,50 +12358,24 @@
 
     <span class="macro">macro_rules! </span>generate_cast_test_case {
         (<span class="macro-nonterminal">$INPUT_ARRAY</span>: expr, <span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>: ident, <span class="macro-nonterminal">$OUTPUT_TYPE</span>: expr, <span class="macro-nonterminal">$OUTPUT_VALUES</span>: expr) =&gt; {
+            <span class="kw">let </span>output = <span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY::from</span>(<span class="macro-nonterminal">$OUTPUT_VALUES</span>)
+                .with_data_type(<span class="macro-nonterminal">$OUTPUT_TYPE</span>.clone());
+
             <span class="comment">// assert cast type
             </span><span class="kw">let </span>input_array_type = <span class="macro-nonterminal">$INPUT_ARRAY</span>.data_type();
             <span class="macro">assert!</span>(can_cast_types(input_array_type, <span class="macro-nonterminal">$OUTPUT_TYPE</span>));
-            <span class="kw">let </span>casted_array = cast(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>).unwrap();
-            <span class="kw">let </span>result_array = casted_array
-                .as_any()
-                .downcast_ref::&lt;<span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>&gt;()
-                .unwrap();
-            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result_array.data_type());
-            <span class="macro">assert_eq!</span>(result_array.len(), <span class="macro-nonterminal">$OUTPUT_VALUES</span>.len());
-            <span class="kw">for </span>(i, x) <span class="kw">in </span><span class="macro-nonterminal">$OUTPUT_VALUES</span>.iter().enumerate() {
-                <span class="kw">match </span>x {
-                    <span class="prelude-val">Some</span>(x) =&gt; {
-                        <span class="macro">assert!</span>(!result_array.is_null(i));
-                        <span class="macro">assert_eq!</span>(result_array.value(i), <span class="kw-2">*</span>x);
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="macro">assert!</span>(result_array.is_null(i));
-                    }
-                }
-            }
+            <span class="kw">let </span>result = cast(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>).unwrap();
+            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result.data_type());
+            <span class="macro">assert_eq!</span>(result.as_ref(), <span class="kw-2">&amp;</span>output);
 
             <span class="kw">let </span>cast_option = CastOptions {
                 safe: <span class="bool-val">false</span>,
                 format_options: FormatOptions::default(),
             };
-            <span class="kw">let </span>casted_array_with_option =
+            <span class="kw">let </span>result =
                 cast_with_options(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>, <span class="kw-2">&amp;</span>cast_option).unwrap();
-            <span class="kw">let </span>result_array = casted_array_with_option
-                .as_any()
-                .downcast_ref::&lt;<span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>&gt;()
-                .unwrap();
-            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result_array.data_type());
-            <span class="macro">assert_eq!</span>(result_array.len(), <span class="macro-nonterminal">$OUTPUT_VALUES</span>.len());
-            <span class="kw">for </span>(i, x) <span class="kw">in </span><span class="macro-nonterminal">$OUTPUT_VALUES</span>.iter().enumerate() {
-                <span class="kw">match </span>x {
-                    <span class="prelude-val">Some</span>(x) =&gt; {
-                        <span class="macro">assert_eq!</span>(result_array.value(i), <span class="kw-2">*</span>x);
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="macro">assert!</span>(result_array.is_null(i));
-                    }
-                }
-            }
+            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result.data_type());
+            <span class="macro">assert_eq!</span>(result.as_ref(), <span class="kw-2">&amp;</span>output);
         };
     }
 
@@ -14976,7 +14901,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_str_to_str_casts() {
-        <span class="kw">for </span>data <span class="kw">in </span><span class="macro">vec!</span>[
+        <span class="kw">for </span>data <span class="kw">in </span>[
             <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;ham&quot;</span>)],
             <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>)],
         ] {
@@ -17913,6 +17838,7 @@
     };
 
     <span class="attr">#[test]
+    #[allow(clippy::assertions_on_constants)]
     </span><span class="kw">fn </span>test_const_options() {
         <span class="macro">assert!</span>(CAST_OPTIONS.safe)
     }
