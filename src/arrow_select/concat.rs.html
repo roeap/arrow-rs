@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-select/src/concat.rs`."><title>concat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ae1b282cda4c21ec.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_select" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (20999de3a 2023-09-15)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-74424d7eec62a23e.js" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-cabe4b1bd7b9da95.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_select/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-select/src/concat.rs`."><title>concat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_select" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (65ea825f4 2023-09-18)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f6ec288034ea164c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_select/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -994,7 +994,12 @@
     <span class="prelude-val">Ok</span>(make_array(mutable.freeze()))
 }
 
-<span class="doccomment">/// Concatenates `batches` together into a single record batch.
+<span class="doccomment">/// Concatenates `batches` together into a single [`RecordBatch`].
+///
+/// The output batch has the specified `schemas`; The schema of the
+/// input are ignored.
+///
+/// Returns an error if the types of underlying arrays are different.
 </span><span class="kw">pub fn </span>concat_batches&lt;<span class="lifetime">&#39;a</span>&gt;(
     schema: <span class="kw-2">&amp;</span>SchemaRef,
     input_batches: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RecordBatch&gt;,
@@ -1010,20 +1015,6 @@
     <span class="kw">let </span>batches: Vec&lt;<span class="kw-2">&amp;</span>RecordBatch&gt; = input_batches.into_iter().collect();
     <span class="kw">if </span>batches.is_empty() {
         <span class="kw">return </span><span class="prelude-val">Ok</span>(RecordBatch::new_empty(schema.clone()));
-    }
-    <span class="kw">if let </span><span class="prelude-val">Some</span>((i, <span class="kw">_</span>)) = batches
-        .iter()
-        .enumerate()
-        .find(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, batch)| batch.schema() != <span class="kw-2">*</span>schema)
-    {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-            <span class="string">&quot;batches[{i}] schema is different with argument schema.
-            batches[{i}] schema: {:?},
-            argument schema: {:?}
-            &quot;</span>,
-            batches[i].schema(),
-            <span class="kw-2">*</span>schema
-        )));
     }
     <span class="kw">let </span>field_num = schema.fields().len();
     <span class="kw">let </span><span class="kw-2">mut </span>arrays = Vec::with_capacity(field_num);
@@ -1562,36 +1553,45 @@
     }
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>concat_record_batches_of_different_schemas() {
-        <span class="kw">let </span>schema1 = Arc::new(Schema::new(<span class="macro">vec!</span>[
-            Field::new(<span class="string">&quot;a&quot;</span>, DataType::Int32, <span class="bool-val">false</span>),
-            Field::new(<span class="string">&quot;b&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        ]));
-        <span class="kw">let </span>schema2 = Arc::new(Schema::new(<span class="macro">vec!</span>[
-            Field::new(<span class="string">&quot;c&quot;</span>, DataType::Int32, <span class="bool-val">false</span>),
-            Field::new(<span class="string">&quot;d&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-        ]));
+    </span><span class="kw">fn </span>concat_record_batches_of_different_schemas_but_compatible_data() {
+        <span class="kw">let </span>schema1 =
+            Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)]));
+        <span class="comment">// column names differ
+        </span><span class="kw">let </span>schema2 =
+            Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(<span class="string">&quot;c&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)]));
         <span class="kw">let </span>batch1 = RecordBatch::try_new(
             schema1.clone(),
-            <span class="macro">vec!</span>[
-                Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>])),
-                Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>])),
-            ],
+            <span class="macro">vec!</span>[Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>]))],
+        )
+        .unwrap();
+        <span class="kw">let </span>batch2 =
+            RecordBatch::try_new(schema2, <span class="macro">vec!</span>[Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">4</span>]))])
+                .unwrap();
+        <span class="comment">// concat_batches simply uses the schema provided
+        </span><span class="kw">let </span>batch = concat_batches(<span class="kw-2">&amp;</span>schema1, [<span class="kw-2">&amp;</span>batch1, <span class="kw-2">&amp;</span>batch2]).unwrap();
+        <span class="macro">assert_eq!</span>(batch.schema().as_ref(), schema1.as_ref());
+        <span class="macro">assert_eq!</span>(<span class="number">4</span>, batch.num_rows());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>concat_record_batches_of_different_schemas_incompatible_data() {
+        <span class="kw">let </span>schema1 =
+            Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)]));
+        <span class="comment">// column names differ
+        </span><span class="kw">let </span>schema2 = Arc::new(Schema::new(<span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>)]));
+        <span class="kw">let </span>batch1 = RecordBatch::try_new(
+            schema1.clone(),
+            <span class="macro">vec!</span>[Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>]))],
         )
         .unwrap();
         <span class="kw">let </span>batch2 = RecordBatch::try_new(
             schema2,
-            <span class="macro">vec!</span>[
-                Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">4</span>])),
-                Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>])),
-            ],
+            <span class="macro">vec!</span>[Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]))],
         )
         .unwrap();
+
         <span class="kw">let </span>error = concat_batches(<span class="kw-2">&amp;</span>schema1, [<span class="kw-2">&amp;</span>batch1, <span class="kw-2">&amp;</span>batch2]).unwrap_err();
-        <span class="macro">assert_eq!</span>(
-            error.to_string(),
-            <span class="string">&quot;Invalid argument error: batches[1] schema is different with argument schema.\n            batches[1] schema: Schema { fields: [Field { name: \&quot;c\&quot;, data_type: Int32, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }, Field { name: \&quot;d\&quot;, data_type: Utf8, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }], metadata: {} },\n            argument schema: Schema { fields: [Field { name: \&quot;a\&quot;, data_type: Int32, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }, Field { name: \&quot;b\&quot;, data_type: Utf8, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }], metadata: {} }\n            &quot;
-        </span>);
+        <span class="macro">assert_eq!</span>(error.to_string(), <span class="string">&quot;Invalid argument error: It is not possible to concatenate arrays of different data types.&quot;</span>);
     }
 
     <span class="attr">#[test]
