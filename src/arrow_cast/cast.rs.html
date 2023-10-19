@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (65ea825f4 2023-09-18)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f6ec288034ea164c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8928,6 +8928,149 @@
 <a href="#8928" id="8928">8928</a>
 <a href="#8929" id="8929">8929</a>
 <a href="#8930" id="8930">8930</a>
+<a href="#8931" id="8931">8931</a>
+<a href="#8932" id="8932">8932</a>
+<a href="#8933" id="8933">8933</a>
+<a href="#8934" id="8934">8934</a>
+<a href="#8935" id="8935">8935</a>
+<a href="#8936" id="8936">8936</a>
+<a href="#8937" id="8937">8937</a>
+<a href="#8938" id="8938">8938</a>
+<a href="#8939" id="8939">8939</a>
+<a href="#8940" id="8940">8940</a>
+<a href="#8941" id="8941">8941</a>
+<a href="#8942" id="8942">8942</a>
+<a href="#8943" id="8943">8943</a>
+<a href="#8944" id="8944">8944</a>
+<a href="#8945" id="8945">8945</a>
+<a href="#8946" id="8946">8946</a>
+<a href="#8947" id="8947">8947</a>
+<a href="#8948" id="8948">8948</a>
+<a href="#8949" id="8949">8949</a>
+<a href="#8950" id="8950">8950</a>
+<a href="#8951" id="8951">8951</a>
+<a href="#8952" id="8952">8952</a>
+<a href="#8953" id="8953">8953</a>
+<a href="#8954" id="8954">8954</a>
+<a href="#8955" id="8955">8955</a>
+<a href="#8956" id="8956">8956</a>
+<a href="#8957" id="8957">8957</a>
+<a href="#8958" id="8958">8958</a>
+<a href="#8959" id="8959">8959</a>
+<a href="#8960" id="8960">8960</a>
+<a href="#8961" id="8961">8961</a>
+<a href="#8962" id="8962">8962</a>
+<a href="#8963" id="8963">8963</a>
+<a href="#8964" id="8964">8964</a>
+<a href="#8965" id="8965">8965</a>
+<a href="#8966" id="8966">8966</a>
+<a href="#8967" id="8967">8967</a>
+<a href="#8968" id="8968">8968</a>
+<a href="#8969" id="8969">8969</a>
+<a href="#8970" id="8970">8970</a>
+<a href="#8971" id="8971">8971</a>
+<a href="#8972" id="8972">8972</a>
+<a href="#8973" id="8973">8973</a>
+<a href="#8974" id="8974">8974</a>
+<a href="#8975" id="8975">8975</a>
+<a href="#8976" id="8976">8976</a>
+<a href="#8977" id="8977">8977</a>
+<a href="#8978" id="8978">8978</a>
+<a href="#8979" id="8979">8979</a>
+<a href="#8980" id="8980">8980</a>
+<a href="#8981" id="8981">8981</a>
+<a href="#8982" id="8982">8982</a>
+<a href="#8983" id="8983">8983</a>
+<a href="#8984" id="8984">8984</a>
+<a href="#8985" id="8985">8985</a>
+<a href="#8986" id="8986">8986</a>
+<a href="#8987" id="8987">8987</a>
+<a href="#8988" id="8988">8988</a>
+<a href="#8989" id="8989">8989</a>
+<a href="#8990" id="8990">8990</a>
+<a href="#8991" id="8991">8991</a>
+<a href="#8992" id="8992">8992</a>
+<a href="#8993" id="8993">8993</a>
+<a href="#8994" id="8994">8994</a>
+<a href="#8995" id="8995">8995</a>
+<a href="#8996" id="8996">8996</a>
+<a href="#8997" id="8997">8997</a>
+<a href="#8998" id="8998">8998</a>
+<a href="#8999" id="8999">8999</a>
+<a href="#9000" id="9000">9000</a>
+<a href="#9001" id="9001">9001</a>
+<a href="#9002" id="9002">9002</a>
+<a href="#9003" id="9003">9003</a>
+<a href="#9004" id="9004">9004</a>
+<a href="#9005" id="9005">9005</a>
+<a href="#9006" id="9006">9006</a>
+<a href="#9007" id="9007">9007</a>
+<a href="#9008" id="9008">9008</a>
+<a href="#9009" id="9009">9009</a>
+<a href="#9010" id="9010">9010</a>
+<a href="#9011" id="9011">9011</a>
+<a href="#9012" id="9012">9012</a>
+<a href="#9013" id="9013">9013</a>
+<a href="#9014" id="9014">9014</a>
+<a href="#9015" id="9015">9015</a>
+<a href="#9016" id="9016">9016</a>
+<a href="#9017" id="9017">9017</a>
+<a href="#9018" id="9018">9018</a>
+<a href="#9019" id="9019">9019</a>
+<a href="#9020" id="9020">9020</a>
+<a href="#9021" id="9021">9021</a>
+<a href="#9022" id="9022">9022</a>
+<a href="#9023" id="9023">9023</a>
+<a href="#9024" id="9024">9024</a>
+<a href="#9025" id="9025">9025</a>
+<a href="#9026" id="9026">9026</a>
+<a href="#9027" id="9027">9027</a>
+<a href="#9028" id="9028">9028</a>
+<a href="#9029" id="9029">9029</a>
+<a href="#9030" id="9030">9030</a>
+<a href="#9031" id="9031">9031</a>
+<a href="#9032" id="9032">9032</a>
+<a href="#9033" id="9033">9033</a>
+<a href="#9034" id="9034">9034</a>
+<a href="#9035" id="9035">9035</a>
+<a href="#9036" id="9036">9036</a>
+<a href="#9037" id="9037">9037</a>
+<a href="#9038" id="9038">9038</a>
+<a href="#9039" id="9039">9039</a>
+<a href="#9040" id="9040">9040</a>
+<a href="#9041" id="9041">9041</a>
+<a href="#9042" id="9042">9042</a>
+<a href="#9043" id="9043">9043</a>
+<a href="#9044" id="9044">9044</a>
+<a href="#9045" id="9045">9045</a>
+<a href="#9046" id="9046">9046</a>
+<a href="#9047" id="9047">9047</a>
+<a href="#9048" id="9048">9048</a>
+<a href="#9049" id="9049">9049</a>
+<a href="#9050" id="9050">9050</a>
+<a href="#9051" id="9051">9051</a>
+<a href="#9052" id="9052">9052</a>
+<a href="#9053" id="9053">9053</a>
+<a href="#9054" id="9054">9054</a>
+<a href="#9055" id="9055">9055</a>
+<a href="#9056" id="9056">9056</a>
+<a href="#9057" id="9057">9057</a>
+<a href="#9058" id="9058">9058</a>
+<a href="#9059" id="9059">9059</a>
+<a href="#9060" id="9060">9060</a>
+<a href="#9061" id="9061">9061</a>
+<a href="#9062" id="9062">9062</a>
+<a href="#9063" id="9063">9063</a>
+<a href="#9064" id="9064">9064</a>
+<a href="#9065" id="9065">9065</a>
+<a href="#9066" id="9066">9066</a>
+<a href="#9067" id="9067">9067</a>
+<a href="#9068" id="9068">9068</a>
+<a href="#9069" id="9069">9069</a>
+<a href="#9070" id="9070">9070</a>
+<a href="#9071" id="9071">9071</a>
+<a href="#9072" id="9072">9072</a>
+<a href="#9073" id="9073">9073</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9294,21 +9437,32 @@
 
     <span class="kw">if </span>cast_options.safe {
         array
-            .unary_opt::&lt;<span class="kw">_</span>, Decimal128Type&gt;(|v| (mul * v.as_()).round().to_i128())
+            .unary_opt::&lt;<span class="kw">_</span>, Decimal128Type&gt;(|v| {
+                (mul * v.as_()).round().to_i128().filter(|v| {
+                    Decimal128Type::validate_decimal_precision(<span class="kw-2">*</span>v, precision).is_ok()
+                })
+            })
             .with_precision_and_scale(precision, scale)
             .map(|a| Arc::new(a) <span class="kw">as </span>ArrayRef)
     } <span class="kw">else </span>{
         array
             .try_unary::&lt;<span class="kw">_</span>, Decimal128Type, <span class="kw">_</span>&gt;(|v| {
-                (mul * v.as_()).round().to_i128().ok_or_else(|| {
-                    ArrowError::CastError(<span class="macro">format!</span>(
-                        <span class="string">&quot;Cannot cast to {}({}, {}). Overflowing on {:?}&quot;</span>,
-                        Decimal128Type::PREFIX,
-                        precision,
-                        scale,
-                        v
-                    ))
-                })
+                (mul * v.as_())
+                    .round()
+                    .to_i128()
+                    .ok_or_else(|| {
+                        ArrowError::CastError(<span class="macro">format!</span>(
+                            <span class="string">&quot;Cannot cast to {}({}, {}). Overflowing on {:?}&quot;</span>,
+                            Decimal128Type::PREFIX,
+                            precision,
+                            scale,
+                            v
+                        ))
+                    })
+                    .and_then(|v| {
+                        Decimal128Type::validate_decimal_precision(v, precision)
+                            .map(|<span class="kw">_</span>| v)
+                    })
             })<span class="question-mark">?
             </span>.with_precision_and_scale(precision, scale)
             .map(|a| Arc::new(a) <span class="kw">as </span>ArrayRef)
@@ -9328,21 +9482,30 @@
 
     <span class="kw">if </span>cast_options.safe {
         array
-            .unary_opt::&lt;<span class="kw">_</span>, Decimal256Type&gt;(|v| i256::from_f64((v.as_() * mul).round()))
+            .unary_opt::&lt;<span class="kw">_</span>, Decimal256Type&gt;(|v| {
+                i256::from_f64((v.as_() * mul).round()).filter(|v| {
+                    Decimal256Type::validate_decimal_precision(<span class="kw-2">*</span>v, precision).is_ok()
+                })
+            })
             .with_precision_and_scale(precision, scale)
             .map(|a| Arc::new(a) <span class="kw">as </span>ArrayRef)
     } <span class="kw">else </span>{
         array
             .try_unary::&lt;<span class="kw">_</span>, Decimal256Type, <span class="kw">_</span>&gt;(|v| {
-                i256::from_f64((v.as_() * mul).round()).ok_or_else(|| {
-                    ArrowError::CastError(<span class="macro">format!</span>(
-                        <span class="string">&quot;Cannot cast to {}({}, {}). Overflowing on {:?}&quot;</span>,
-                        Decimal256Type::PREFIX,
-                        precision,
-                        scale,
-                        v
-                    ))
-                })
+                i256::from_f64((v.as_() * mul).round())
+                    .ok_or_else(|| {
+                        ArrowError::CastError(<span class="macro">format!</span>(
+                            <span class="string">&quot;Cannot cast to {}({}, {}). Overflowing on {:?}&quot;</span>,
+                            Decimal256Type::PREFIX,
+                            precision,
+                            scale,
+                            v
+                        ))
+                    })
+                    .and_then(|v| {
+                        Decimal256Type::validate_decimal_precision(v, precision)
+                            .map(|<span class="kw">_</span>| v)
+                    })
             })<span class="question-mark">?
             </span>.with_precision_and_scale(precision, scale)
             .map(|a| Arc::new(a) <span class="kw">as </span>ArrayRef)
@@ -11731,6 +11894,11 @@
     <span class="kw">if </span>cast_options.safe {
         <span class="kw">let </span>iter = from.iter().map(|v| {
             v.and_then(|v| parse_string_to_decimal_native::&lt;T&gt;(v, scale <span class="kw">as </span>usize).ok())
+                .and_then(|v| {
+                    T::validate_decimal_precision(v, precision)
+                        .is_ok()
+                        .then_some(v)
+                })
         });
         <span class="comment">// Benefit:
         //     20% performance improvement
@@ -11745,13 +11913,17 @@
             .iter()
             .map(|v| {
                 v.map(|v| {
-                    parse_string_to_decimal_native::&lt;T&gt;(v, scale <span class="kw">as </span>usize).map_err(|<span class="kw">_</span>| {
-                        ArrowError::CastError(<span class="macro">format!</span>(
-                            <span class="string">&quot;Cannot cast string &#39;{}&#39; to value of {:?} type&quot;</span>,
-                            v,
-                            T::DATA_TYPE,
-                        ))
-                    })
+                    parse_string_to_decimal_native::&lt;T&gt;(v, scale <span class="kw">as </span>usize)
+                        .map_err(|<span class="kw">_</span>| {
+                            ArrowError::CastError(<span class="macro">format!</span>(
+                                <span class="string">&quot;Cannot cast string &#39;{}&#39; to value of {:?} type&quot;</span>,
+                                v,
+                                T::DATA_TYPE,
+                            ))
+                        })
+                        .and_then(|v| {
+                            T::validate_decimal_precision(v, precision).map(|<span class="kw">_</span>| v)
+                        })
                 })
                 .transpose()
             })
@@ -16670,6 +16842,68 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_floating_point_to_decimal128_precision_overflow() {
+        <span class="kw">let </span>array = Float64Array::from(<span class="macro">vec!</span>[<span class="number">1.1</span>]);
+        <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal128(<span class="number">2</span>, <span class="number">2</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">true</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert!</span>(casted_array.is_ok());
+        <span class="macro">assert!</span>(casted_array.unwrap().is_null(<span class="number">0</span>));
+
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal128(<span class="number">2</span>, <span class="number">2</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">false</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="kw">let </span>err = casted_array.unwrap_err().to_string();
+        <span class="kw">let </span>expected_error = <span class="string">&quot;Invalid argument error: 110 is too large to store in a Decimal128 of precision 2. Max is 99&quot;</span>;
+        <span class="macro">assert!</span>(
+            err.contains(expected_error),
+            <span class="string">&quot;did not find expected error &#39;{expected_error}&#39; in actual error &#39;{err}&#39;&quot;
+        </span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_floating_point_to_decimal256_precision_overflow() {
+        <span class="kw">let </span>array = Float64Array::from(<span class="macro">vec!</span>[<span class="number">1.1</span>]);
+        <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal256(<span class="number">2</span>, <span class="number">2</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">true</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert!</span>(casted_array.is_ok());
+        <span class="macro">assert!</span>(casted_array.unwrap().is_null(<span class="number">0</span>));
+
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal256(<span class="number">2</span>, <span class="number">2</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">false</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="kw">let </span>err = casted_array.unwrap_err().to_string();
+        <span class="kw">let </span>expected_error = <span class="string">&quot;Invalid argument error: 110 is too large to store in a Decimal256 of precision 2. Max is 99&quot;</span>;
+        <span class="macro">assert!</span>(
+            err.contains(expected_error),
+            <span class="string">&quot;did not find expected error &#39;{expected_error}&#39; in actual error &#39;{err}&#39;&quot;
+        </span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cast_floating_point_to_decimal128_overflow() {
         <span class="kw">let </span>array = Float64Array::from(<span class="macro">vec!</span>[f64::MAX]);
         <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
@@ -17083,6 +17317,32 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_string_to_decimal128_precision_overflow() {
+        <span class="kw">let </span>array = StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;1000&quot;</span>.to_string()]);
+        <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal128(<span class="number">10</span>, <span class="number">8</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">true</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert!</span>(casted_array.is_ok());
+        <span class="macro">assert!</span>(casted_array.unwrap().is_null(<span class="number">0</span>));
+
+        <span class="kw">let </span>err = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal128(<span class="number">10</span>, <span class="number">8</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">false</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;Invalid argument error: 100000000000 is too large to store in a Decimal128 of precision 10. Max is 9999999999&quot;</span>, err.unwrap_err().to_string());
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cast_utf8_to_decimal128_overflow() {
         <span class="kw">let </span>overflow_str_array = StringArray::from(<span class="macro">vec!</span>[
             i128::MAX.to_string(),
@@ -17137,6 +17397,32 @@
         );
         <span class="macro">assert!</span>(decimal_arr.is_null(<span class="number">5</span>));
         <span class="macro">assert!</span>(decimal_arr.is_null(<span class="number">6</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_string_to_decimal256_precision_overflow() {
+        <span class="kw">let </span>array = StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;1000&quot;</span>.to_string()]);
+        <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>casted_array = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal256(<span class="number">10</span>, <span class="number">8</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">true</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert!</span>(casted_array.is_ok());
+        <span class="macro">assert!</span>(casted_array.unwrap().is_null(<span class="number">0</span>));
+
+        <span class="kw">let </span>err = cast_with_options(
+            <span class="kw-2">&amp;</span>array,
+            <span class="kw-2">&amp;</span>DataType::Decimal256(<span class="number">10</span>, <span class="number">8</span>),
+            <span class="kw-2">&amp;</span>CastOptions {
+                safe: <span class="bool-val">false</span>,
+                format_options: FormatOptions::default(),
+            },
+        );
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;Invalid argument error: 100000000000 is too large to store in a Decimal256 of precision 10. Max is 9999999999&quot;</span>, err.unwrap_err().to_string());
     }
 
     <span class="attr">#[test]
