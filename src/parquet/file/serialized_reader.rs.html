@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/file/serialized_reader.rs`."><title>serialized_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/file/serialized_reader.rs`."><title>serialized_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (249624b50 2023-10-20)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1731,27 +1731,6 @@
 <a href="#1731" id="1731">1731</a>
 <a href="#1732" id="1732">1732</a>
 <a href="#1733" id="1733">1733</a>
-<a href="#1734" id="1734">1734</a>
-<a href="#1735" id="1735">1735</a>
-<a href="#1736" id="1736">1736</a>
-<a href="#1737" id="1737">1737</a>
-<a href="#1738" id="1738">1738</a>
-<a href="#1739" id="1739">1739</a>
-<a href="#1740" id="1740">1740</a>
-<a href="#1741" id="1741">1741</a>
-<a href="#1742" id="1742">1742</a>
-<a href="#1743" id="1743">1743</a>
-<a href="#1744" id="1744">1744</a>
-<a href="#1745" id="1745">1745</a>
-<a href="#1746" id="1746">1746</a>
-<a href="#1747" id="1747">1747</a>
-<a href="#1748" id="1748">1748</a>
-<a href="#1749" id="1749">1749</a>
-<a href="#1750" id="1750">1750</a>
-<a href="#1751" id="1751">1751</a>
-<a href="#1752" id="1752">1752</a>
-<a href="#1753" id="1753">1753</a>
-<a href="#1754" id="1754">1754</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1967,10 +1946,8 @@
             <span class="kw">let </span><span class="kw-2">mut </span>offset_indexes = <span class="macro">vec!</span>[];
 
             <span class="kw">for </span>rg <span class="kw">in </span><span class="kw-2">&amp;mut </span>filtered_row_groups {
-                <span class="kw">let </span>column_index =
-                    index_reader::read_columns_indexes(<span class="kw-2">&amp;</span>chunk_reader, rg.columns())<span class="question-mark">?</span>;
-                <span class="kw">let </span>offset_index =
-                    index_reader::read_pages_locations(<span class="kw-2">&amp;</span>chunk_reader, rg.columns())<span class="question-mark">?</span>;
+                <span class="kw">let </span>column_index = index_reader::read_columns_indexes(<span class="kw-2">&amp;</span>chunk_reader, rg.columns())<span class="question-mark">?</span>;
+                <span class="kw">let </span>offset_index = index_reader::read_pages_locations(<span class="kw-2">&amp;</span>chunk_reader, rg.columns())<span class="question-mark">?</span>;
                 columns_indexes.push(column_index);
                 offset_indexes.push(offset_index);
             }
@@ -2156,8 +2133,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>can_decompress = <span class="bool-val">true</span>;
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>header_v2) = page_header.data_page_header_v2 {
-        offset = (header_v2.definition_levels_byte_length
-            + header_v2.repetition_levels_byte_length) <span class="kw">as </span>usize;
+        offset = (header_v2.definition_levels_byte_length + header_v2.repetition_levels_byte_length)
+            <span class="kw">as </span>usize;
         <span class="comment">// When is_compressed flag is missing the page is considered compressed
         </span>can_decompress = header_v2.is_compressed.unwrap_or(<span class="bool-val">true</span>);
     }
@@ -2191,10 +2168,9 @@
 
     <span class="kw">let </span>result = <span class="kw">match </span>page_header.type_ {
         PageType::DICTIONARY_PAGE =&gt; {
-            <span class="kw">let </span>dict_header =
-                page_header.dictionary_page_header.as_ref().ok_or_else(|| {
-                    ParquetError::General(<span class="string">&quot;Missing dictionary page header&quot;</span>.to_string())
-                })<span class="question-mark">?</span>;
+            <span class="kw">let </span>dict_header = page_header.dictionary_page_header.as_ref().ok_or_else(|| {
+                ParquetError::General(<span class="string">&quot;Missing dictionary page header&quot;</span>.to_string())
+            })<span class="question-mark">?</span>;
             <span class="kw">let </span>is_sorted = dict_header.is_sorted.unwrap_or(<span class="bool-val">false</span>);
             Page::DictionaryPage {
                 buf: buffer,
@@ -2204,9 +2180,9 @@
             }
         }
         PageType::DATA_PAGE =&gt; {
-            <span class="kw">let </span>header = page_header.data_page_header.ok_or_else(|| {
-                ParquetError::General(<span class="string">&quot;Missing V1 data page header&quot;</span>.to_string())
-            })<span class="question-mark">?</span>;
+            <span class="kw">let </span>header = page_header
+                .data_page_header
+                .ok_or_else(|| ParquetError::General(<span class="string">&quot;Missing V1 data page header&quot;</span>.to_string()))<span class="question-mark">?</span>;
             Page::DataPage {
                 buf: buffer,
                 num_values: header.num_values <span class="kw">as </span>u32,
@@ -2217,9 +2193,9 @@
             }
         }
         PageType::DATA_PAGE_V2 =&gt; {
-            <span class="kw">let </span>header = page_header.data_page_header_v2.ok_or_else(|| {
-                ParquetError::General(<span class="string">&quot;Missing V2 data page header&quot;</span>.to_string())
-            })<span class="question-mark">?</span>;
+            <span class="kw">let </span>header = page_header
+                .data_page_header_v2
+                .ok_or_else(|| ParquetError::General(<span class="string">&quot;Missing V2 data page header&quot;</span>.to_string()))<span class="question-mark">?</span>;
             <span class="kw">let </span>is_compressed = header.is_compressed.unwrap_or(<span class="bool-val">true</span>);
             Page::DataPageV2 {
                 buf: buffer,
@@ -2286,13 +2262,7 @@
         page_locations: <span class="prelude-ty">Option</span>&lt;Vec&lt;PageLocation&gt;&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>props = Arc::new(ReaderProperties::builder().build());
-        SerializedPageReader::new_with_properties(
-            reader,
-            meta,
-            total_rows,
-            page_locations,
-            props,
-        )
+        SerializedPageReader::new_with_properties(reader, meta, total_rows, page_locations, props)
     }
 
     <span class="doccomment">/// Creates a new serialized page with custom options.
@@ -2309,14 +2279,11 @@
         <span class="kw">let </span>state = <span class="kw">match </span>page_locations {
             <span class="prelude-val">Some</span>(locations) =&gt; {
                 <span class="kw">let </span>dictionary_page = <span class="kw">match </span>locations.first() {
-                    <span class="prelude-val">Some</span>(dict_offset) <span class="kw">if </span>dict_offset.offset <span class="kw">as </span>u64 != start =&gt; {
-                        <span class="prelude-val">Some</span>(PageLocation {
-                            offset: start <span class="kw">as </span>i64,
-                            compressed_page_size: (dict_offset.offset <span class="kw">as </span>u64 - start)
-                                <span class="kw">as </span>i32,
-                            first_row_index: <span class="number">0</span>,
-                        })
-                    }
+                    <span class="prelude-val">Some</span>(dict_offset) <span class="kw">if </span>dict_offset.offset <span class="kw">as </span>u64 != start =&gt; <span class="prelude-val">Some</span>(PageLocation {
+                        offset: start <span class="kw">as </span>i64,
+                        compressed_page_size: (dict_offset.offset <span class="kw">as </span>u64 - start) <span class="kw">as </span>i32,
+                        first_row_index: <span class="number">0</span>,
+                    }),
                     <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 };
 
@@ -2527,9 +2494,7 @@
 
     <span class="kw">fn </span>at_record_boundary(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.state {
-            SerializedPageReaderState::Values { .. } =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.peek_next_page()<span class="question-mark">?</span>.is_none())
-            }
+            SerializedPageReaderState::Values { .. } =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.peek_next_page()<span class="question-mark">?</span>.is_none()),
             SerializedPageReaderState::Pages { .. } =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
         }
     }
@@ -2546,9 +2511,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::data_type::private::ParquetValueType;
     <span class="kw">use </span><span class="kw">crate</span>::data_type::{AsBytes, FixedLenByteArrayType};
     <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index::{Index, NativeIndex};
-    <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index_reader::{
-        read_columns_indexes, read_pages_locations,
-    };
+    <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index_reader::{read_columns_indexes, read_pages_locations};
     <span class="kw">use </span><span class="kw">crate</span>::file::writer::SerializedFileWriter;
     <span class="kw">use </span><span class="kw">crate</span>::record::RowAccessor;
     <span class="kw">use </span><span class="kw">crate</span>::schema::parser::parse_message_type;
@@ -2910,8 +2873,7 @@
         </span><span class="macro">assert_eq!</span>(col0_metadata.bloom_filter_offset().unwrap(), <span class="number">192</span>);
 
         <span class="comment">// test page encoding stats
-        </span><span class="kw">let </span>page_encoding_stats =
-            col0_metadata.page_encoding_stats().unwrap().get(<span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>page_encoding_stats = col0_metadata.page_encoding_stats().unwrap().get(<span class="number">0</span>).unwrap();
 
         <span class="macro">assert_eq!</span>(page_encoding_stats.page_type, basic::PageType::DATA_PAGE);
         <span class="macro">assert_eq!</span>(page_encoding_stats.encoding, Encoding::PLAIN);
@@ -3302,10 +3264,7 @@
         });
     }
 
-    <span class="kw">fn </span>get_row_group_min_max_bytes(
-        r: <span class="kw-2">&amp;</span>RowGroupMetaData,
-        col_num: usize,
-    ) -&gt; (<span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[u8]) {
+    <span class="kw">fn </span>get_row_group_min_max_bytes(r: <span class="kw-2">&amp;</span>RowGroupMetaData, col_num: usize) -&gt; (<span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[u8]) {
         <span class="kw">let </span>statistics = r.column(col_num).statistics().unwrap();
         (statistics.min_bytes(), statistics.max_bytes())
     }
@@ -3467,8 +3426,7 @@
         <span class="kw">let </span>schema = parse_message_type(message_type).unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::with_capacity(<span class="number">1024</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>writer =
-            SerializedFileWriter::new(<span class="kw-2">&amp;mut </span>out, Arc::new(schema), Default::default())
-                .unwrap();
+            SerializedFileWriter::new(<span class="kw-2">&amp;mut </span>out, Arc::new(schema), Default::default()).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>r = writer.next_row_group().unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>c = r.next_column().unwrap().unwrap();

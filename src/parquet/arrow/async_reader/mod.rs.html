@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/async_reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/async_reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (249624b50 2023-10-20)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1732,44 +1732,6 @@
 <a href="#1732" id="1732">1732</a>
 <a href="#1733" id="1733">1733</a>
 <a href="#1734" id="1734">1734</a>
-<a href="#1735" id="1735">1735</a>
-<a href="#1736" id="1736">1736</a>
-<a href="#1737" id="1737">1737</a>
-<a href="#1738" id="1738">1738</a>
-<a href="#1739" id="1739">1739</a>
-<a href="#1740" id="1740">1740</a>
-<a href="#1741" id="1741">1741</a>
-<a href="#1742" id="1742">1742</a>
-<a href="#1743" id="1743">1743</a>
-<a href="#1744" id="1744">1744</a>
-<a href="#1745" id="1745">1745</a>
-<a href="#1746" id="1746">1746</a>
-<a href="#1747" id="1747">1747</a>
-<a href="#1748" id="1748">1748</a>
-<a href="#1749" id="1749">1749</a>
-<a href="#1750" id="1750">1750</a>
-<a href="#1751" id="1751">1751</a>
-<a href="#1752" id="1752">1752</a>
-<a href="#1753" id="1753">1753</a>
-<a href="#1754" id="1754">1754</a>
-<a href="#1755" id="1755">1755</a>
-<a href="#1756" id="1756">1756</a>
-<a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
-<a href="#1759" id="1759">1759</a>
-<a href="#1760" id="1760">1760</a>
-<a href="#1761" id="1761">1761</a>
-<a href="#1762" id="1762">1762</a>
-<a href="#1763" id="1763">1763</a>
-<a href="#1764" id="1764">1764</a>
-<a href="#1765" id="1765">1765</a>
-<a href="#1766" id="1766">1766</a>
-<a href="#1767" id="1767">1767</a>
-<a href="#1768" id="1768">1768</a>
-<a href="#1769" id="1769">1769</a>
-<a href="#1770" id="1770">1770</a>
-<a href="#1771" id="1771">1771</a>
-<a href="#1772" id="1772">1772</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1866,9 +1828,8 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::{build_array_reader, RowGroups};
 <span class="kw">use </span><span class="kw">crate</span>::arrow::arrow_reader::{
-    apply_range, evaluate_predicate, selects_any, ArrowReaderBuilder,
-    ArrowReaderMetadata, ArrowReaderOptions, ParquetRecordBatchReader, RowFilter,
-    RowSelection,
+    apply_range, evaluate_predicate, selects_any, ArrowReaderBuilder, ArrowReaderMetadata,
+    ArrowReaderOptions, ParquetRecordBatchReader, RowFilter, RowSelection,
 };
 <span class="kw">use </span><span class="kw">crate</span>::arrow::ProjectionMask;
 
@@ -1881,9 +1842,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::file::metadata::{ParquetMetaData, RowGroupMetaData};
 <span class="kw">use </span><span class="kw">crate</span>::file::reader::{ChunkReader, Length, SerializedPageReader};
 <span class="kw">use </span><span class="kw">crate</span>::file::FOOTER_SIZE;
-<span class="kw">use </span><span class="kw">crate</span>::format::{
-    BloomFilterAlgorithm, BloomFilterCompression, BloomFilterHash, PageLocation,
-};
+<span class="kw">use </span><span class="kw">crate</span>::format::{BloomFilterAlgorithm, BloomFilterCompression, BloomFilterHash, PageLocation};
 
 <span class="kw">mod </span>metadata;
 <span class="kw">pub use </span>metadata::<span class="kw-2">*</span>;
@@ -1901,10 +1860,7 @@
     </span><span class="kw">fn </span>get_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;usize&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;Bytes&gt;&gt;;
 
     <span class="doccomment">/// Retrieve multiple byte ranges. The default implementation will call `get_bytes` sequentially
-    </span><span class="kw">fn </span>get_byte_ranges(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        ranges: Vec&lt;Range&lt;usize&gt;&gt;,
-    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;Vec&lt;Bytes&gt;&gt;&gt; {
+    </span><span class="kw">fn </span>get_byte_ranges(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ranges: Vec&lt;Range&lt;usize&gt;&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;Vec&lt;Bytes&gt;&gt;&gt; {
         <span class="kw">async move </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::with_capacity(ranges.len());
 
@@ -1929,10 +1885,7 @@
         <span class="self">self</span>.as_mut().get_bytes(range)
     }
 
-    <span class="kw">fn </span>get_byte_ranges(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        ranges: Vec&lt;Range&lt;usize&gt;&gt;,
-    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;Vec&lt;Bytes&gt;&gt;&gt; {
+    <span class="kw">fn </span>get_byte_ranges(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ranges: Vec&lt;Range&lt;usize&gt;&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;Vec&lt;Bytes&gt;&gt;&gt; {
         <span class="self">self</span>.as_mut().get_byte_ranges(ranges)
     }
 
@@ -2026,10 +1979,7 @@
 
     <span class="doccomment">/// Create a new [`ParquetRecordBatchStreamBuilder`] with the provided parquet file
     /// and [`ArrowReaderOptions`]
-    </span><span class="kw">pub async fn </span>new_with_options(
-        <span class="kw-2">mut </span>input: T,
-        options: ArrowReaderOptions,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    </span><span class="kw">pub async fn </span>new_with_options(<span class="kw-2">mut </span>input: T, options: ArrowReaderOptions) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>metadata = ArrowReaderMetadata::load_async(<span class="kw-2">&amp;mut </span>input, options).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>::new_with_metadata(input, metadata))
     }
@@ -2088,9 +2038,9 @@
         <span class="kw">let </span>column_metadata = metadata.column(column_idx);
 
         <span class="kw">let </span>offset: usize = <span class="kw">if let </span><span class="prelude-val">Some</span>(offset) = column_metadata.bloom_filter_offset() {
-            offset.try_into().map_err(|<span class="kw">_</span>| {
-                ParquetError::General(<span class="string">&quot;Bloom filter offset is invalid&quot;</span>.to_string())
-            })<span class="question-mark">?
+            offset
+                .try_into()
+                .map_err(|<span class="kw">_</span>| ParquetError::General(<span class="string">&quot;Bloom filter offset is invalid&quot;</span>.to_string()))<span class="question-mark">?
         </span>} <span class="kw">else </span>{
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         };
@@ -2131,9 +2081,7 @@
                 })<span class="question-mark">?</span>;
                 <span class="self">self</span>.input
                     .<span class="number">0
-                    </span>.get_bytes(
-                        bitset_offset <span class="kw">as </span>usize..bitset_offset <span class="kw">as </span>usize + bitset_length,
-                    )
+                    </span>.get_bytes(bitset_offset <span class="kw">as </span>usize..bitset_offset <span class="kw">as </span>usize + bitset_length)
                     .<span class="kw">await</span><span class="question-mark">?
             </span>}
         };
@@ -2243,11 +2191,8 @@
                     .fetch(<span class="kw-2">&amp;mut </span><span class="self">self</span>.input, predicate_projection, selection.as_ref())
                     .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let </span>array_reader = build_array_reader(
-                    <span class="self">self</span>.fields.as_deref(),
-                    predicate_projection,
-                    <span class="kw-2">&amp;</span>row_group,
-                )<span class="question-mark">?</span>;
+                <span class="kw">let </span>array_reader =
+                    build_array_reader(<span class="self">self</span>.fields.as_deref(), predicate_projection, <span class="kw-2">&amp;</span>row_group)<span class="question-mark">?</span>;
 
                 selection = <span class="prelude-val">Some</span>(evaluate_predicate(
                     batch_size,
@@ -2373,10 +2318,7 @@
 {
     <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;RecordBatch&gt;;
 
-    <span class="kw">fn </span>poll_next(
-        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
-        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
-    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
         <span class="kw">loop </span>{
             <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.state {
                 StreamState::Decoding(batch_reader) =&gt; <span class="kw">match </span>batch_reader.next() {
@@ -2385,9 +2327,7 @@
                     }
                     <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; {
                         <span class="self">self</span>.state = StreamState::Error;
-                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(ParquetError::ArrowError(
-                            e.to_string(),
-                        ))));
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(ParquetError::ArrowError(e.to_string()))));
                     }
                     <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.state = StreamState::Init,
                 },
@@ -2399,11 +2339,9 @@
 
                     <span class="kw">let </span>reader = <span class="self">self</span>.reader.take().expect(<span class="string">&quot;lost reader&quot;</span>);
 
-                    <span class="kw">let </span>row_count =
-                        <span class="self">self</span>.metadata.row_group(row_group_idx).num_rows() <span class="kw">as </span>usize;
+                    <span class="kw">let </span>row_count = <span class="self">self</span>.metadata.row_group(row_group_idx).num_rows() <span class="kw">as </span>usize;
 
-                    <span class="kw">let </span>selection =
-                        <span class="self">self</span>.selection.as_mut().map(|s| s.split_off(row_count));
+                    <span class="kw">let </span>selection = <span class="self">self</span>.selection.as_mut().map(|s| s.split_off(row_count));
 
                     <span class="kw">let </span>fut = reader
                         .read_row_group(
@@ -2479,8 +2417,7 @@
                     }
 
                     ranges.extend(selection.scan_ranges(<span class="kw-2">&amp;</span>page_locations[idx]));
-                    page_start_offsets
-                        .push(ranges.iter().map(|range| range.start).collect());
+                    page_start_offsets.push(ranges.iter().map(|range| range.start).collect());
 
                     ranges
                 })
@@ -2551,13 +2488,12 @@
             </span>))),
             <span class="prelude-val">Some</span>(data) =&gt; {
                 <span class="kw">let </span>page_locations = <span class="self">self</span>.page_locations.map(|index| index[i].clone());
-                <span class="kw">let </span>page_reader: Box&lt;<span class="kw">dyn </span>PageReader&gt; =
-                    Box::new(SerializedPageReader::new(
-                        data.clone(),
-                        <span class="self">self</span>.metadata.column(i),
-                        <span class="self">self</span>.row_count,
-                        page_locations,
-                    )<span class="question-mark">?</span>);
+                <span class="kw">let </span>page_reader: Box&lt;<span class="kw">dyn </span>PageReader&gt; = Box::new(SerializedPageReader::new(
+                    data.clone(),
+                    <span class="self">self</span>.metadata.column(i),
+                    <span class="self">self</span>.row_count,
+                    page_locations,
+                )<span class="question-mark">?</span>);
 
                 <span class="prelude-val">Ok</span>(Box::new(ColumnChunkIterator {
                     reader: <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(page_reader)),
@@ -2653,9 +2589,7 @@
     <span class="kw">use </span>arrow_array::builder::{ListBuilder, StringBuilder};
     <span class="kw">use </span>arrow_array::cast::AsArray;
     <span class="kw">use </span>arrow_array::types::Int32Type;
-    <span class="kw">use </span>arrow_array::{
-        Array, ArrayRef, Int32Array, Int8Array, Scalar, StringArray, UInt64Array,
-    };
+    <span class="kw">use </span>arrow_array::{Array, ArrayRef, Int32Array, Int8Array, Scalar, StringArray, UInt64Array};
     <span class="kw">use </span>arrow_schema::{DataType, Field, Schema};
     <span class="kw">use </span>futures::{StreamExt, TryStreamExt};
     <span class="kw">use </span>rand::{thread_rng, Rng};
@@ -2753,10 +2687,9 @@
         };
 
         <span class="kw">let </span>options = ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>);
-        <span class="kw">let </span>builder =
-            ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
-                .<span class="kw">await
-                </span>.unwrap();
+        <span class="kw">let </span>builder = ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
+            .<span class="kw">await
+            </span>.unwrap();
 
         <span class="comment">// The builder should have page and offset indexes loaded now
         </span><span class="kw">let </span>metadata_with_index = builder.metadata();
@@ -2864,10 +2797,9 @@
         };
 
         <span class="kw">let </span>options = ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>);
-        <span class="kw">let </span>builder =
-            ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
-                .<span class="kw">await
-                </span>.unwrap();
+        <span class="kw">let </span>builder = ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
+            .<span class="kw">await
+            </span>.unwrap();
 
         <span class="kw">let </span>selection = RowSelection::from(<span class="macro">vec!</span>[
             RowSelector::skip(<span class="number">21</span>),   <span class="comment">// Skip first page
@@ -2946,10 +2878,9 @@
             };
 
             <span class="kw">let </span>options = ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>);
-            <span class="kw">let </span>builder =
-                ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
-                    .<span class="kw">await
-                    </span>.unwrap();
+            <span class="kw">let </span>builder = ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
+                .<span class="kw">await
+                </span>.unwrap();
 
             <span class="kw">let </span>col_idx: usize = rand.gen_range(<span class="number">0</span>..<span class="number">13</span>);
             <span class="kw">let </span>mask = ProjectionMask::leaves(builder.parquet_schema(), <span class="macro">vec!</span>[col_idx]);
@@ -2962,8 +2893,7 @@
 
             <span class="kw">let </span>async_batches: Vec&lt;<span class="kw">_</span>&gt; = stream.try_collect().<span class="kw">await</span>.unwrap();
 
-            <span class="kw">let </span>actual_rows: usize =
-                async_batches.into_iter().map(|b| b.num_rows()).sum();
+            <span class="kw">let </span>actual_rows: usize = async_batches.into_iter().map(|b| b.num_rows()).sum();
 
             <span class="macro">assert_eq!</span>(actual_rows, expected_rows);
         }
@@ -3017,10 +2947,9 @@
         };
 
         <span class="kw">let </span>options = ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>);
-        <span class="kw">let </span>builder =
-            ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
-                .<span class="kw">await
-                </span>.unwrap();
+        <span class="kw">let </span>builder = ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
+            .<span class="kw">await
+            </span>.unwrap();
 
         <span class="kw">let </span>col_idx: usize = rand.gen_range(<span class="number">0</span>..<span class="number">13</span>);
         <span class="kw">let </span>mask = ProjectionMask::leaves(builder.parquet_schema(), <span class="macro">vec!</span>[col_idx]);
@@ -3125,8 +3054,7 @@
         <span class="kw">let </span>props = WriterProperties::builder()
             .set_max_row_group_size(<span class="number">3</span>)
             .build();
-        <span class="kw">let </span><span class="kw-2">mut </span>writer =
-            ArrowWriter::try_new(<span class="kw-2">&amp;mut </span>buf, data.schema(), <span class="prelude-val">Some</span>(props)).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = ArrowWriter::try_new(<span class="kw-2">&amp;mut </span>buf, data.schema(), <span class="prelude-val">Some</span>(props)).unwrap();
         writer.write(<span class="kw-2">&amp;</span>data).unwrap();
         writer.close().unwrap();
 
@@ -3231,10 +3159,10 @@
             requests: Default::default(),
         };
 
-        <span class="kw">let </span>a_filter = ArrowPredicateFn::new(
-            ProjectionMask::leaves(<span class="kw-2">&amp;</span>parquet_schema, <span class="macro">vec!</span>[<span class="number">1</span>]),
-            |batch| <span class="prelude-val">Ok</span>(batch.column(<span class="number">0</span>).as_boolean().clone()),
-        );
+        <span class="kw">let </span>a_filter =
+            ArrowPredicateFn::new(ProjectionMask::leaves(<span class="kw-2">&amp;</span>parquet_schema, <span class="macro">vec!</span>[<span class="number">1</span>]), |batch| {
+                <span class="prelude-val">Ok</span>(batch.column(<span class="number">0</span>).as_boolean().clone())
+            });
 
         <span class="kw">let </span>b_scalar = Int8Array::from(<span class="macro">vec!</span>[<span class="number">2</span>]);
         <span class="kw">let </span>b_filter = ArrowPredicateFn::new(
@@ -3247,15 +3175,14 @@
         <span class="kw">let </span>mask = ProjectionMask::leaves(<span class="kw-2">&amp;</span>parquet_schema, <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">2</span>]);
 
         <span class="kw">let </span>options = ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>);
-        <span class="kw">let </span>stream =
-            ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
-                .<span class="kw">await
-                </span>.unwrap()
-                .with_projection(mask.clone())
-                .with_batch_size(<span class="number">1024</span>)
-                .with_row_filter(filter)
-                .build()
-                .unwrap();
+        <span class="kw">let </span>stream = ParquetRecordBatchStreamBuilder::new_with_options(async_reader, options)
+            .<span class="kw">await
+            </span>.unwrap()
+            .with_projection(mask.clone())
+            .with_batch_size(<span class="number">1024</span>)
+            .with_row_filter(filter)
+            .build()
+            .unwrap();
 
         <span class="kw">let </span>batches: Vec&lt;RecordBatch&gt; = stream.try_collect().<span class="kw">await</span>.unwrap();
 
@@ -3306,8 +3233,7 @@
 
         <span class="kw">let </span>_schema_desc = metadata.file_metadata().schema_descr();
 
-        <span class="kw">let </span>projection =
-            ProjectionMask::leaves(metadata.file_metadata().schema_descr(), <span class="macro">vec!</span>[<span class="number">0</span>]);
+        <span class="kw">let </span>projection = ProjectionMask::leaves(metadata.file_metadata().schema_descr(), <span class="macro">vec!</span>[<span class="number">0</span>]);
 
         <span class="kw">let </span>reader_factory = ReaderFactory {
             metadata,
@@ -3416,8 +3342,7 @@
         <span class="kw">let </span>props = WriterProperties::builder()
             .set_bloom_filter_enabled(<span class="bool-val">true</span>)
             .build();
-        <span class="kw">let </span><span class="kw-2">mut </span>writer =
-            ArrowWriter::try_new(<span class="kw-2">&amp;mut </span>parquet_data, schema, <span class="prelude-val">Some</span>(props)).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = ArrowWriter::try_new(<span class="kw-2">&amp;mut </span>parquet_data, schema, <span class="prelude-val">Some</span>(props)).unwrap();
         <span class="kw">for </span>batch <span class="kw">in </span>batches {
             writer.write(<span class="kw-2">&amp;</span>batch).unwrap();
         }
@@ -3476,8 +3401,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>builder = ListBuilder::new(StringBuilder::new());
         <span class="kw">for </span>id <span class="kw">in </span><span class="number">0</span>..<span class="number">1024 </span>{
             <span class="kw">match </span>id % <span class="number">3 </span>{
-                <span class="number">0 </span>=&gt; builder
-                    .append_value([<span class="prelude-val">Some</span>(<span class="string">&quot;val_1&quot;</span>.to_string()), <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;id_{id}&quot;</span>))]),
+                <span class="number">0 </span>=&gt; builder.append_value([<span class="prelude-val">Some</span>(<span class="string">&quot;val_1&quot;</span>.to_string()), <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;id_{id}&quot;</span>))]),
                 <span class="number">1 </span>=&gt; builder.append_value([<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;id_{id}&quot;</span>))]),
                 <span class="kw">_ </span>=&gt; builder.append_null(),
             }

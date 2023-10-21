@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/basic.rs`."><title>basic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/basic.rs`."><title>basic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (249624b50 2023-10-20)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2286,36 +2286,6 @@
 <a href="#2286" id="2286">2286</a>
 <a href="#2287" id="2287">2287</a>
 <a href="#2288" id="2288">2288</a>
-<a href="#2289" id="2289">2289</a>
-<a href="#2290" id="2290">2290</a>
-<a href="#2291" id="2291">2291</a>
-<a href="#2292" id="2292">2292</a>
-<a href="#2293" id="2293">2293</a>
-<a href="#2294" id="2294">2294</a>
-<a href="#2295" id="2295">2295</a>
-<a href="#2296" id="2296">2296</a>
-<a href="#2297" id="2297">2297</a>
-<a href="#2298" id="2298">2298</a>
-<a href="#2299" id="2299">2299</a>
-<a href="#2300" id="2300">2300</a>
-<a href="#2301" id="2301">2301</a>
-<a href="#2302" id="2302">2302</a>
-<a href="#2303" id="2303">2303</a>
-<a href="#2304" id="2304">2304</a>
-<a href="#2305" id="2305">2305</a>
-<a href="#2306" id="2306">2306</a>
-<a href="#2307" id="2307">2307</a>
-<a href="#2308" id="2308">2308</a>
-<a href="#2309" id="2309">2309</a>
-<a href="#2310" id="2310">2310</a>
-<a href="#2311" id="2311">2311</a>
-<a href="#2312" id="2312">2312</a>
-<a href="#2313" id="2313">2313</a>
-<a href="#2314" id="2314">2314</a>
-<a href="#2315" id="2315">2315</a>
-<a href="#2316" id="2316">2316</a>
-<a href="#2317" id="2317">2317</a>
-<a href="#2318" id="2318">2318</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2346,8 +2316,8 @@
 
 <span class="comment">// Re-export crate::format types used in this module
 </span><span class="kw">pub use </span><span class="kw">crate</span>::format::{
-    BsonType, DateType, DecimalType, EnumType, IntType, JsonType, ListType, MapType,
-    NullType, StringType, TimeType, TimeUnit, TimestampType, UUIDType,
+    BsonType, DateType, DecimalType, EnumType, IntType, JsonType, ListType, MapType, NullType,
+    StringType, TimeType, TimeUnit, TimestampType, UUIDType,
 };
 
 <span class="comment">// ----------------------------------------------------------------------
@@ -2606,9 +2576,7 @@
             <span class="string">&quot;PLAIN_DICTIONARY&quot; </span>| <span class="string">&quot;plain_dictionary&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Encoding::PLAIN_DICTIONARY),
             <span class="string">&quot;RLE&quot; </span>| <span class="string">&quot;rle&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Encoding::RLE),
             <span class="string">&quot;BIT_PACKED&quot; </span>| <span class="string">&quot;bit_packed&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Encoding::BIT_PACKED),
-            <span class="string">&quot;DELTA_BINARY_PACKED&quot; </span>| <span class="string">&quot;delta_binary_packed&quot; </span>=&gt; {
-                <span class="prelude-val">Ok</span>(Encoding::DELTA_BINARY_PACKED)
-            }
+            <span class="string">&quot;DELTA_BINARY_PACKED&quot; </span>| <span class="string">&quot;delta_binary_packed&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Encoding::DELTA_BINARY_PACKED),
             <span class="string">&quot;DELTA_LENGTH_BYTE_ARRAY&quot; </span>| <span class="string">&quot;delta_length_byte_array&quot; </span>=&gt; {
                 <span class="prelude-val">Ok</span>(Encoding::DELTA_LENGTH_BYTE_ARRAY)
             }
@@ -2637,22 +2605,16 @@
     LZ4_RAW,
 }
 
-<span class="kw">fn </span>split_compression_string(
-    str_setting: <span class="kw-2">&amp;</span>str,
-) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;u32&gt;), ParquetError&gt; {
+<span class="kw">fn </span>split_compression_string(str_setting: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;u32&gt;), ParquetError&gt; {
     <span class="kw">let </span>split_setting = str_setting.split_once(<span class="string">&#39;(&#39;</span>);
 
     <span class="kw">match </span>split_setting {
         <span class="prelude-val">Some</span>((codec, level_str)) =&gt; {
-            <span class="kw">let </span>level =
-                <span class="kw-2">&amp;</span>level_str[..level_str.len() - <span class="number">1</span>]
-                    .parse::&lt;u32&gt;()
-                    .map_err(|<span class="kw">_</span>| {
-                        ParquetError::General(<span class="macro">format!</span>(
-                            <span class="string">&quot;invalid compression level: {}&quot;</span>,
-                            level_str
-                        ))
-                    })<span class="question-mark">?</span>;
+            <span class="kw">let </span>level = <span class="kw-2">&amp;</span>level_str[..level_str.len() - <span class="number">1</span>]
+                .parse::&lt;u32&gt;()
+                .map_err(|<span class="kw">_</span>| {
+                    ParquetError::General(<span class="macro">format!</span>(<span class="string">&quot;invalid compression level: {}&quot;</span>, level_str))
+                })<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>((codec, <span class="prelude-val">Some</span>(<span class="kw-2">*</span>level)))
         }
         <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>((str_setting, <span class="prelude-val">None</span>)),
@@ -2790,10 +2752,9 @@
         <span class="comment">// TODO: Should this take converted and logical type, for compatibility?
         </span><span class="kw">match </span>logical_type {
             <span class="prelude-val">Some</span>(logical) =&gt; <span class="kw">match </span>logical {
-                LogicalType::String
-                | LogicalType::Enum
-                | LogicalType::Json
-                | LogicalType::Bson =&gt; SortOrder::UNSIGNED,
+                LogicalType::String | LogicalType::Enum | LogicalType::Json | LogicalType::Bson =&gt; {
+                    SortOrder::UNSIGNED
+                }
                 LogicalType::Integer { is_signed, .. } =&gt; <span class="kw">match </span>is_signed {
                     <span class="bool-val">true </span>=&gt; SortOrder::SIGNED,
                     <span class="bool-val">false </span>=&gt; SortOrder::UNSIGNED,
@@ -2811,10 +2772,7 @@
         }
     }
 
-    <span class="kw">fn </span>get_converted_sort_order(
-        converted_type: ConvertedType,
-        physical_type: Type,
-    ) -&gt; SortOrder {
+    <span class="kw">fn </span>get_converted_sort_order(converted_type: ConvertedType, physical_type: Type) -&gt; SortOrder {
         <span class="kw">match </span>converted_type {
             <span class="comment">// Unsigned byte-wise comparison.
             </span>ConvertedType::UTF8
@@ -2984,12 +2942,8 @@
                 parquet::ConvertedType::DATE =&gt; ConvertedType::DATE,
                 parquet::ConvertedType::TIME_MILLIS =&gt; ConvertedType::TIME_MILLIS,
                 parquet::ConvertedType::TIME_MICROS =&gt; ConvertedType::TIME_MICROS,
-                parquet::ConvertedType::TIMESTAMP_MILLIS =&gt; {
-                    ConvertedType::TIMESTAMP_MILLIS
-                }
-                parquet::ConvertedType::TIMESTAMP_MICROS =&gt; {
-                    ConvertedType::TIMESTAMP_MICROS
-                }
+                parquet::ConvertedType::TIMESTAMP_MILLIS =&gt; ConvertedType::TIMESTAMP_MILLIS,
+                parquet::ConvertedType::TIMESTAMP_MICROS =&gt; ConvertedType::TIMESTAMP_MICROS,
                 parquet::ConvertedType::UINT_8 =&gt; ConvertedType::UINT_8,
                 parquet::ConvertedType::UINT_16 =&gt; ConvertedType::UINT_16,
                 parquet::ConvertedType::UINT_32 =&gt; ConvertedType::UINT_32,
@@ -3025,12 +2979,8 @@
             ConvertedType::DATE =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::DATE),
             ConvertedType::TIME_MILLIS =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::TIME_MILLIS),
             ConvertedType::TIME_MICROS =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::TIME_MICROS),
-            ConvertedType::TIMESTAMP_MILLIS =&gt; {
-                <span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MILLIS)
-            }
-            ConvertedType::TIMESTAMP_MICROS =&gt; {
-                <span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MICROS)
-            }
+            ConvertedType::TIMESTAMP_MILLIS =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MILLIS),
+            ConvertedType::TIMESTAMP_MICROS =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MICROS),
             ConvertedType::UINT_8 =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::UINT_8),
             ConvertedType::UINT_16 =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::UINT_16),
             ConvertedType::UINT_32 =&gt; <span class="prelude-val">Some</span>(parquet::ConvertedType::UINT_32),
@@ -3218,9 +3168,7 @@
             parquet::Encoding::RLE =&gt; Encoding::RLE,
             parquet::Encoding::BIT_PACKED =&gt; Encoding::BIT_PACKED,
             parquet::Encoding::DELTA_BINARY_PACKED =&gt; Encoding::DELTA_BINARY_PACKED,
-            parquet::Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; {
-                Encoding::DELTA_LENGTH_BYTE_ARRAY
-            }
+            parquet::Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; Encoding::DELTA_LENGTH_BYTE_ARRAY,
             parquet::Encoding::DELTA_BYTE_ARRAY =&gt; Encoding::DELTA_BYTE_ARRAY,
             parquet::Encoding::RLE_DICTIONARY =&gt; Encoding::RLE_DICTIONARY,
             parquet::Encoding::BYTE_STREAM_SPLIT =&gt; Encoding::BYTE_STREAM_SPLIT,
@@ -3237,9 +3185,7 @@
             Encoding::RLE =&gt; parquet::Encoding::RLE,
             Encoding::BIT_PACKED =&gt; parquet::Encoding::BIT_PACKED,
             Encoding::DELTA_BINARY_PACKED =&gt; parquet::Encoding::DELTA_BINARY_PACKED,
-            Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; {
-                parquet::Encoding::DELTA_LENGTH_BYTE_ARRAY
-            }
+            Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; parquet::Encoding::DELTA_LENGTH_BYTE_ARRAY,
             Encoding::DELTA_BYTE_ARRAY =&gt; parquet::Encoding::DELTA_BYTE_ARRAY,
             Encoding::RLE_DICTIONARY =&gt; parquet::Encoding::RLE_DICTIONARY,
             Encoding::BYTE_STREAM_SPLIT =&gt; parquet::Encoding::BYTE_STREAM_SPLIT,
@@ -3596,13 +3542,11 @@
             ConvertedType::TIME_MICROS
         );
         <span class="macro">assert_eq!</span>(
-            ConvertedType::try_from(<span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MILLIS))
-                .unwrap(),
+            ConvertedType::try_from(<span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MILLIS)).unwrap(),
             ConvertedType::TIMESTAMP_MILLIS
         );
         <span class="macro">assert_eq!</span>(
-            ConvertedType::try_from(<span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MICROS))
-                .unwrap(),
+            ConvertedType::try_from(<span class="prelude-val">Some</span>(parquet::ConvertedType::TIMESTAMP_MICROS)).unwrap(),
             ConvertedType::TIMESTAMP_MICROS
         );
         <span class="macro">assert_eq!</span>(
@@ -4357,11 +4301,7 @@
         </span><span class="kw">fn </span>check_sort_order(types: Vec&lt;LogicalType&gt;, expected_order: SortOrder) {
             <span class="kw">for </span>tpe <span class="kw">in </span>types {
                 <span class="macro">assert_eq!</span>(
-                    ColumnOrder::get_sort_order(
-                        <span class="prelude-val">Some</span>(tpe),
-                        ConvertedType::NONE,
-                        Type::BYTE_ARRAY
-                    ),
+                    ColumnOrder::get_sort_order(<span class="prelude-val">Some</span>(tpe), ConvertedType::NONE, Type::BYTE_ARRAY),
                     expected_order
                 );
             }

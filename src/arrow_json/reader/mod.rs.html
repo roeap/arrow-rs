@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (249624b50 2023-10-20)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2230,16 +2230,6 @@
 <a href="#2230" id="2230">2230</a>
 <a href="#2231" id="2231">2231</a>
 <a href="#2232" id="2232">2232</a>
-<a href="#2233" id="2233">2233</a>
-<a href="#2234" id="2234">2234</a>
-<a href="#2235" id="2235">2235</a>
-<a href="#2236" id="2236">2236</a>
-<a href="#2237" id="2237">2237</a>
-<a href="#2238" id="2238">2238</a>
-<a href="#2239" id="2239">2239</a>
-<a href="#2240" id="2240">2240</a>
-<a href="#2241" id="2241">2241</a>
-<a href="#2242" id="2242">2242</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2384,9 +2374,7 @@
 <span class="kw">use </span>arrow_array::timezone::Tz;
 <span class="kw">use </span>arrow_array::types::Float32Type;
 <span class="kw">use </span>arrow_array::types::<span class="kw-2">*</span>;
-<span class="kw">use </span>arrow_array::{
-    downcast_integer, make_array, RecordBatch, RecordBatchReader, StructArray,
-};
+<span class="kw">use </span>arrow_array::{downcast_integer, make_array, RecordBatch, RecordBatchReader, StructArray};
 <span class="kw">use </span>arrow_data::ArrayData;
 <span class="kw">use </span>arrow_schema::{ArrowError, DataType, FieldRef, Schema, SchemaRef, TimeUnit};
 <span class="kw">pub use </span>schema::<span class="kw-2">*</span>;
@@ -2532,8 +2520,7 @@
             }
         };
 
-        <span class="kw">let </span>decoder =
-            make_decoder(data_type, <span class="self">self</span>.coerce_primitive, <span class="self">self</span>.strict_mode, nullable)<span class="question-mark">?</span>;
+        <span class="kw">let </span>decoder = make_decoder(data_type, <span class="self">self</span>.coerce_primitive, <span class="self">self</span>.strict_mode, nullable)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>num_fields = <span class="self">self</span>.schema.all_fields().len();
 
@@ -2871,8 +2858,9 @@
 
         <span class="kw">let </span>batch = <span class="kw">match </span><span class="self">self</span>.is_field {
             <span class="bool-val">true </span>=&gt; RecordBatch::try_new(<span class="self">self</span>.schema.clone(), <span class="macro">vec!</span>[make_array(decoded)])<span class="question-mark">?</span>,
-            <span class="bool-val">false </span>=&gt; RecordBatch::from(StructArray::from(decoded))
-                .with_schema(<span class="self">self</span>.schema.clone())<span class="question-mark">?</span>,
+            <span class="bool-val">false </span>=&gt; {
+                RecordBatch::from(StructArray::from(decoded)).with_schema(<span class="self">self</span>.schema.clone())<span class="question-mark">?
+            </span>}
         };
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(batch))
@@ -2961,9 +2949,7 @@
 
     <span class="kw">use </span>arrow_array::cast::AsArray;
     <span class="kw">use </span>arrow_array::types::Int32Type;
-    <span class="kw">use </span>arrow_array::{
-        make_array, Array, BooleanArray, ListArray, StringArray, StructArray,
-    };
+    <span class="kw">use </span>arrow_array::{make_array, Array, BooleanArray, ListArray, StringArray, StructArray};
     <span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
     <span class="kw">use </span>arrow_cast::display::{ArrayFormatter, FormatOptions};
     <span class="kw">use </span>arrow_data::ArrayDataBuilder;
@@ -3787,11 +3773,7 @@
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[
             Field::new(<span class="string">&quot;a&quot;</span>, DataType::Int16, <span class="bool-val">false</span>),
             Field::new(<span class="string">&quot;b&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-            Field::new_struct(
-                <span class="string">&quot;c&quot;</span>,
-                <span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)],
-                <span class="bool-val">false</span>,
-            ),
+            Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)], <span class="bool-val">false</span>),
         ]));
 
         <span class="kw">let </span>err = ReaderBuilder::new(schema)
@@ -4074,15 +4056,13 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_nested_list_json_arrays() {
-        <span class="kw">let </span>c_field =
-            Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;d&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>)], <span class="bool-val">true</span>);
+        <span class="kw">let </span>c_field = Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;d&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>)], <span class="bool-val">true</span>);
         <span class="kw">let </span>a_struct_field = Field::new_struct(
             <span class="string">&quot;a&quot;</span>,
             <span class="macro">vec!</span>[Field::new(<span class="string">&quot;b&quot;</span>, DataType::Boolean, <span class="bool-val">true</span>), c_field.clone()],
             <span class="bool-val">true</span>,
         );
-        <span class="kw">let </span>a_field =
-            Field::new(<span class="string">&quot;a&quot;</span>, DataType::List(Arc::new(a_struct_field.clone())), <span class="bool-val">true</span>);
+        <span class="kw">let </span>a_field = Field::new(<span class="string">&quot;a&quot;</span>, DataType::List(Arc::new(a_struct_field.clone())), <span class="bool-val">true</span>);
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[a_field.clone()]));
         <span class="kw">let </span>builder = ReaderBuilder::new(schema).with_batch_size(<span class="number">64</span>);
         <span class="kw">let </span>json_content = <span class="string">r#&quot;

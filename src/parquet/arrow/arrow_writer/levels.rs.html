@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/arrow_writer/levels.rs`."><title>levels.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (0039d739d 2023-10-18)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/arrow_writer/levels.rs`."><title>levels.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-deb46770fd761b69.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (249624b50 2023-10-20)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1839,28 +1839,6 @@
 <a href="#1839" id="1839">1839</a>
 <a href="#1840" id="1840">1840</a>
 <a href="#1841" id="1841">1841</a>
-<a href="#1842" id="1842">1842</a>
-<a href="#1843" id="1843">1843</a>
-<a href="#1844" id="1844">1844</a>
-<a href="#1845" id="1845">1845</a>
-<a href="#1846" id="1846">1846</a>
-<a href="#1847" id="1847">1847</a>
-<a href="#1848" id="1848">1848</a>
-<a href="#1849" id="1849">1849</a>
-<a href="#1850" id="1850">1850</a>
-<a href="#1851" id="1851">1851</a>
-<a href="#1852" id="1852">1852</a>
-<a href="#1853" id="1853">1853</a>
-<a href="#1854" id="1854">1854</a>
-<a href="#1855" id="1855">1855</a>
-<a href="#1856" id="1856">1856</a>
-<a href="#1857" id="1857">1857</a>
-<a href="#1858" id="1858">1858</a>
-<a href="#1859" id="1859">1859</a>
-<a href="#1860" id="1860">1860</a>
-<a href="#1861" id="1861">1861</a>
-<a href="#1862" id="1862">1862</a>
-<a href="#1863" id="1863">1863</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1913,10 +1891,7 @@
 
 <span class="doccomment">/// Performs a depth-first scan of the children of `array`, constructing [`ArrayLevels`]
 /// for each leaf column encountered
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_array_levels(
-    array: <span class="kw-2">&amp;</span>ArrayRef,
-    field: <span class="kw-2">&amp;</span>Field,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ArrayLevels&gt;&gt; {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_array_levels(array: <span class="kw-2">&amp;</span>ArrayRef, field: <span class="kw-2">&amp;</span>Field) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ArrayLevels&gt;&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>builder = LevelInfoBuilder::try_new(field, Default::default(), array)<span class="question-mark">?</span>;
     builder.write(<span class="number">0</span>..array.len());
     <span class="prelude-val">Ok</span>(builder.finish())
@@ -1997,11 +1972,7 @@
 
 <span class="kw">impl </span>LevelInfoBuilder {
     <span class="doccomment">/// Create a new [`LevelInfoBuilder`] for the given [`Field`] and parent [`LevelContext`]
-    </span><span class="kw">fn </span>try_new(
-        field: <span class="kw-2">&amp;</span>Field,
-        parent_ctx: LevelContext,
-        array: <span class="kw-2">&amp;</span>ArrayRef,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+    </span><span class="kw">fn </span>try_new(field: <span class="kw-2">&amp;</span>Field, parent_ctx: LevelContext, array: <span class="kw-2">&amp;</span>ArrayRef) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="macro">assert_eq!</span>(field.data_type(), array.data_type());
         <span class="kw">let </span>is_nullable = field.is_nullable();
 
@@ -2090,9 +2061,7 @@
             LevelInfoBuilder::List(v, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
             | LevelInfoBuilder::LargeList(v, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)
             | LevelInfoBuilder::FixedSizeList(v, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; v.finish(),
-            LevelInfoBuilder::Struct(v, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                v.into_iter().flat_map(|l| l.finish()).collect()
-            }
+            LevelInfoBuilder::Struct(v, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; v.into_iter().flat_map(|l| l.finish()).collect(),
         }
     }
 
@@ -2271,55 +2240,52 @@
         nulls: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NullBuffer&gt;,
         range: Range&lt;usize&gt;,
     ) {
-        <span class="kw">let </span>write_non_null =
-            |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
-                <span class="kw">let </span>values_start = start_idx * fixed_size;
-                <span class="kw">let </span>values_end = end_idx * fixed_size;
-                child.write(values_start..values_end);
+        <span class="kw">let </span>write_non_null = |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
+            <span class="kw">let </span>values_start = start_idx * fixed_size;
+            <span class="kw">let </span>values_end = end_idx * fixed_size;
+            child.write(values_start..values_end);
 
-                child.visit_leaves(|leaf| {
-                    <span class="kw">let </span>rep_levels = leaf.rep_levels.as_mut().unwrap();
+            child.visit_leaves(|leaf| {
+                <span class="kw">let </span>rep_levels = leaf.rep_levels.as_mut().unwrap();
 
-                    <span class="kw">let </span>row_indices = (<span class="number">0</span>..fixed_size)
-                        .rev()
-                        .cycle()
-                        .take(values_end - values_start);
+                <span class="kw">let </span>row_indices = (<span class="number">0</span>..fixed_size)
+                    .rev()
+                    .cycle()
+                    .take(values_end - values_start);
 
-                    <span class="comment">// Step backward over the child rep levels and mark the start of each list
-                    </span>rep_levels
-                        .iter_mut()
-                        .rev()
-                        <span class="comment">// Filter out reps from nested children
-                        </span>.filter(|&amp;&amp;<span class="kw-2">mut </span>r| r == ctx.rep_level)
-                        .zip(row_indices)
-                        .for_each(|(r, idx)| {
-                            <span class="kw">if </span>idx == <span class="number">0 </span>{
-                                <span class="kw-2">*</span>r = ctx.rep_level - <span class="number">1</span>;
-                            }
-                        });
-                })
-            };
+                <span class="comment">// Step backward over the child rep levels and mark the start of each list
+                </span>rep_levels
+                    .iter_mut()
+                    .rev()
+                    <span class="comment">// Filter out reps from nested children
+                    </span>.filter(|&amp;&amp;<span class="kw-2">mut </span>r| r == ctx.rep_level)
+                    .zip(row_indices)
+                    .for_each(|(r, idx)| {
+                        <span class="kw">if </span>idx == <span class="number">0 </span>{
+                            <span class="kw-2">*</span>r = ctx.rep_level - <span class="number">1</span>;
+                        }
+                    });
+            })
+        };
 
         <span class="comment">// If list size is 0, ignore values and just write rep/def levels.
-        </span><span class="kw">let </span>write_empty =
-            |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
-                <span class="kw">let </span>len = end_idx - start_idx;
-                child.visit_leaves(|leaf| {
-                    <span class="kw">let </span>rep_levels = leaf.rep_levels.as_mut().unwrap();
-                    rep_levels.extend(std::iter::repeat(ctx.rep_level - <span class="number">1</span>).take(len));
-                    <span class="kw">let </span>def_levels = leaf.def_levels.as_mut().unwrap();
-                    def_levels.extend(std::iter::repeat(ctx.def_level - <span class="number">1</span>).take(len));
-                })
-            };
+        </span><span class="kw">let </span>write_empty = |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
+            <span class="kw">let </span>len = end_idx - start_idx;
+            child.visit_leaves(|leaf| {
+                <span class="kw">let </span>rep_levels = leaf.rep_levels.as_mut().unwrap();
+                rep_levels.extend(std::iter::repeat(ctx.rep_level - <span class="number">1</span>).take(len));
+                <span class="kw">let </span>def_levels = leaf.def_levels.as_mut().unwrap();
+                def_levels.extend(std::iter::repeat(ctx.def_level - <span class="number">1</span>).take(len));
+            })
+        };
 
-        <span class="kw">let </span>write_rows =
-            |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
-                <span class="kw">if </span>fixed_size &gt; <span class="number">0 </span>{
-                    write_non_null(child, start_idx, end_idx)
-                } <span class="kw">else </span>{
-                    write_empty(child, start_idx, end_idx)
-                }
-            };
+        <span class="kw">let </span>write_rows = |child: <span class="kw-2">&amp;mut </span>LevelInfoBuilder, start_idx: usize, end_idx: usize| {
+            <span class="kw">if </span>fixed_size &gt; <span class="number">0 </span>{
+                write_non_null(child, start_idx, end_idx)
+            } <span class="kw">else </span>{
+                write_empty(child, start_idx, end_idx)
+            }
+        };
 
         <span class="kw">match </span>nulls {
             <span class="prelude-val">Some</span>(nulls) =&gt; {
@@ -2882,10 +2848,7 @@
         </span><span class="kw">let </span>c = Int32Array::from_iter([<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">6</span>)]);
         <span class="kw">let </span>leaf = Arc::new(c) <span class="kw">as </span>ArrayRef;
         <span class="kw">let </span>c_field = Arc::new(Field::new(<span class="string">&quot;c&quot;</span>, DataType::Int32, <span class="bool-val">true</span>));
-        <span class="kw">let </span>b = StructArray::from((
-            (<span class="macro">vec!</span>[(c_field, leaf.clone())]),
-            Buffer::from([<span class="number">0b00110111</span>]),
-        ));
+        <span class="kw">let </span>b = StructArray::from(((<span class="macro">vec!</span>[(c_field, leaf.clone())]), Buffer::from([<span class="number">0b00110111</span>])));
 
         <span class="kw">let </span>b_field = Arc::new(Field::new(<span class="string">&quot;b&quot;</span>, b.data_type().clone(), <span class="bool-val">true</span>));
         <span class="kw">let </span>a = StructArray::from((
@@ -2916,8 +2879,7 @@
 
         </span><span class="kw">let </span>a_values = Int32Array::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]);
         <span class="kw">let </span>a_value_offsets = arrow::buffer::Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">10</span>]);
-        <span class="kw">let </span>a_list_type =
-            DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int32, <span class="bool-val">true</span>)));
+        <span class="kw">let </span>a_list_type = DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int32, <span class="bool-val">true</span>)));
         <span class="kw">let </span>a_list_data = ArrayData::builder(a_list_type.clone())
             .len(<span class="number">5</span>)
             .add_buffer(a_value_offsets)
@@ -2972,9 +2934,7 @@
             Field::new(<span class="string">&quot;b&quot;</span>, DataType::Int32, <span class="bool-val">true</span>),
             Field::new(
                 <span class="string">&quot;c&quot;</span>,
-                DataType::Struct(
-                    <span class="macro">vec!</span>[struct_field_d.clone(), struct_field_e.clone()].into(),
-                ),
+                DataType::Struct(<span class="macro">vec!</span>[struct_field_d.clone(), struct_field_e.clone()].into()),
                 <span class="bool-val">true</span>, <span class="comment">// https://github.com/apache/arrow-rs/issues/245
             </span>),
         ]);
@@ -2989,8 +2949,7 @@
 
         <span class="comment">// Construct a buffer for value offsets, for the nested array:
         //  [[1], [2, 3], null, [4, 5, 6], [7, 8, 9, 10]]
-        </span><span class="kw">let </span>g_value_offsets =
-            arrow::buffer::Buffer::from(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">10</span>].to_byte_slice());
+        </span><span class="kw">let </span>g_value_offsets = arrow::buffer::Buffer::from(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">10</span>].to_byte_slice());
 
         <span class="comment">// Construct a list array from the above two
         </span><span class="kw">let </span>g_list_data = ArrayData::builder(struct_field_g.data_type().clone())
@@ -3102,8 +3061,7 @@
 
         <span class="comment">// build a record batch
         </span><span class="kw">let </span>batch =
-            RecordBatch::try_new(Arc::new(schema), <span class="macro">vec!</span>[Arc::new(some_nested_object)])
-                .unwrap();
+            RecordBatch::try_new(Arc::new(schema), <span class="macro">vec!</span>[Arc::new(some_nested_object)]).unwrap();
 
         <span class="kw">let </span>struct_null_level =
             calculate_array_levels(batch.column(<span class="number">0</span>), batch.schema().field(<span class="number">0</span>)).unwrap();
@@ -3125,8 +3083,7 @@
 
         <span class="comment">// build a record batch
         </span><span class="kw">let </span>batch =
-            RecordBatch::try_new(Arc::new(schema), <span class="macro">vec!</span>[Arc::new(some_nested_object)])
-                .unwrap();
+            RecordBatch::try_new(Arc::new(schema), <span class="macro">vec!</span>[Arc::new(some_nested_object)]).unwrap();
 
         <span class="kw">let </span>struct_non_null_level =
             calculate_array_levels(batch.column(<span class="number">0</span>), batch.schema().field(<span class="number">0</span>)).unwrap();
@@ -3361,9 +3318,9 @@
         <span class="kw">let </span>field_a2 = Arc::new(Field::new(<span class="string">&quot;integers&quot;</span>, a2.data_type().clone(), <span class="bool-val">true</span>));
 
         <span class="kw">let </span>nulls = Buffer::from([<span class="number">0b00110111</span>]);
-        <span class="kw">let </span>struct_a = Arc::new(
-            StructArray::try_from((<span class="macro">vec!</span>[(field_a1, a1), (field_a2, a2)], nulls)).unwrap(),
-        ) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>struct_a =
+            Arc::new(StructArray::try_from((<span class="macro">vec!</span>[(field_a1, a1), (field_a2, a2)], nulls)).unwrap())
+                <span class="kw">as </span>ArrayRef;
 
         <span class="kw">let </span>offsets = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">5</span>]);
         <span class="kw">let </span>nulls = Buffer::from([<span class="number">0b00111100</span>]);
@@ -3656,8 +3613,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_fixed_size_list_of_var_lists() {
         <span class="comment">// [[[1, null, 3], null], [[4], []], [[5, 6], [null, null]], null]
-        </span><span class="kw">let </span><span class="kw-2">mut </span>builder =
-            FixedSizeListBuilder::new(ListBuilder::new(Int32Builder::new()), <span class="number">2</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>builder = FixedSizeListBuilder::new(ListBuilder::new(Int32Builder::new()), <span class="number">2</span>);
         builder.values().append_value([<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">3</span>)]);
         builder.values().append_null();
         builder.append(<span class="bool-val">true</span>);
