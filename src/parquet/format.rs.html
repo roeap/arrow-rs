@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/format.rs`."><title>format.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (aa1a71e9e 2023-10-26)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/format.rs`."><title>format.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -5118,6 +5118,90 @@
 <a href="#5118" id="5118">5118</a>
 <a href="#5119" id="5119">5119</a>
 <a href="#5120" id="5120">5120</a>
+<a href="#5121" id="5121">5121</a>
+<a href="#5122" id="5122">5122</a>
+<a href="#5123" id="5123">5123</a>
+<a href="#5124" id="5124">5124</a>
+<a href="#5125" id="5125">5125</a>
+<a href="#5126" id="5126">5126</a>
+<a href="#5127" id="5127">5127</a>
+<a href="#5128" id="5128">5128</a>
+<a href="#5129" id="5129">5129</a>
+<a href="#5130" id="5130">5130</a>
+<a href="#5131" id="5131">5131</a>
+<a href="#5132" id="5132">5132</a>
+<a href="#5133" id="5133">5133</a>
+<a href="#5134" id="5134">5134</a>
+<a href="#5135" id="5135">5135</a>
+<a href="#5136" id="5136">5136</a>
+<a href="#5137" id="5137">5137</a>
+<a href="#5138" id="5138">5138</a>
+<a href="#5139" id="5139">5139</a>
+<a href="#5140" id="5140">5140</a>
+<a href="#5141" id="5141">5141</a>
+<a href="#5142" id="5142">5142</a>
+<a href="#5143" id="5143">5143</a>
+<a href="#5144" id="5144">5144</a>
+<a href="#5145" id="5145">5145</a>
+<a href="#5146" id="5146">5146</a>
+<a href="#5147" id="5147">5147</a>
+<a href="#5148" id="5148">5148</a>
+<a href="#5149" id="5149">5149</a>
+<a href="#5150" id="5150">5150</a>
+<a href="#5151" id="5151">5151</a>
+<a href="#5152" id="5152">5152</a>
+<a href="#5153" id="5153">5153</a>
+<a href="#5154" id="5154">5154</a>
+<a href="#5155" id="5155">5155</a>
+<a href="#5156" id="5156">5156</a>
+<a href="#5157" id="5157">5157</a>
+<a href="#5158" id="5158">5158</a>
+<a href="#5159" id="5159">5159</a>
+<a href="#5160" id="5160">5160</a>
+<a href="#5161" id="5161">5161</a>
+<a href="#5162" id="5162">5162</a>
+<a href="#5163" id="5163">5163</a>
+<a href="#5164" id="5164">5164</a>
+<a href="#5165" id="5165">5165</a>
+<a href="#5166" id="5166">5166</a>
+<a href="#5167" id="5167">5167</a>
+<a href="#5168" id="5168">5168</a>
+<a href="#5169" id="5169">5169</a>
+<a href="#5170" id="5170">5170</a>
+<a href="#5171" id="5171">5171</a>
+<a href="#5172" id="5172">5172</a>
+<a href="#5173" id="5173">5173</a>
+<a href="#5174" id="5174">5174</a>
+<a href="#5175" id="5175">5175</a>
+<a href="#5176" id="5176">5176</a>
+<a href="#5177" id="5177">5177</a>
+<a href="#5178" id="5178">5178</a>
+<a href="#5179" id="5179">5179</a>
+<a href="#5180" id="5180">5180</a>
+<a href="#5181" id="5181">5181</a>
+<a href="#5182" id="5182">5182</a>
+<a href="#5183" id="5183">5183</a>
+<a href="#5184" id="5184">5184</a>
+<a href="#5185" id="5185">5185</a>
+<a href="#5186" id="5186">5186</a>
+<a href="#5187" id="5187">5187</a>
+<a href="#5188" id="5188">5188</a>
+<a href="#5189" id="5189">5189</a>
+<a href="#5190" id="5190">5190</a>
+<a href="#5191" id="5191">5191</a>
+<a href="#5192" id="5192">5192</a>
+<a href="#5193" id="5193">5193</a>
+<a href="#5194" id="5194">5194</a>
+<a href="#5195" id="5195">5195</a>
+<a href="#5196" id="5196">5196</a>
+<a href="#5197" id="5197">5197</a>
+<a href="#5198" id="5198">5198</a>
+<a href="#5199" id="5199">5199</a>
+<a href="#5200" id="5200">5200</a>
+<a href="#5201" id="5201">5201</a>
+<a href="#5202" id="5202">5202</a>
+<a href="#5203" id="5203">5203</a>
+<a href="#5204" id="5204">5204</a>
 </pre></div><pre class="rust"><code><span class="comment">// Autogenerated by Thrift Compiler (0.19.0)
 // DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 
@@ -5777,16 +5861,26 @@
   </span><span class="kw">pub </span>null_count: <span class="prelude-ty">Option</span>&lt;i64&gt;,
   <span class="doccomment">/// count of distinct values occurring
   </span><span class="kw">pub </span>distinct_count: <span class="prelude-ty">Option</span>&lt;i64&gt;,
-  <span class="doccomment">/// Min and max values for the column, determined by its ColumnOrder.
+  <span class="doccomment">/// Lower and upper bound values for the column, determined by its ColumnOrder.
+  /// 
+  /// These may be the actual minimum and maximum values found on a page or column
+  /// chunk, but can also be (more compact) values that do not exist on a page or
+  /// column chunk. For example, instead of storing &quot;Blart Versenwald III&quot;, a writer
+  /// may set min_value=&quot;B&quot;, max_value=&quot;C&quot;. Such more compact values must still be
+  /// valid values within the column&#39;s logical type.
   /// 
   /// Values are encoded using PLAIN encoding, except that variable-length byte
   /// arrays do not include a length prefix.
   </span><span class="kw">pub </span>max_value: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
   <span class="kw">pub </span>min_value: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
+  <span class="doccomment">/// If true, max_value is the actual maximum value for a column
+  </span><span class="kw">pub </span>is_max_value_exact: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+  <span class="doccomment">/// If true, min_value is the actual minimum value for a column
+  </span><span class="kw">pub </span>is_min_value_exact: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
 <span class="kw">impl </span>Statistics {
-  <span class="kw">pub fn </span>new&lt;F1, F2, F3, F4, F5, F6&gt;(max: F1, min: F2, null_count: F3, distinct_count: F4, max_value: F5, min_value: F6) -&gt; Statistics <span class="kw">where </span>F1: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F2: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F3: Into&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt;, F4: Into&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt;, F5: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F6: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt; {
+  <span class="kw">pub fn </span>new&lt;F1, F2, F3, F4, F5, F6, F7, F8&gt;(max: F1, min: F2, null_count: F3, distinct_count: F4, max_value: F5, min_value: F6, is_max_value_exact: F7, is_min_value_exact: F8) -&gt; Statistics <span class="kw">where </span>F1: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F2: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F3: Into&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt;, F4: Into&lt;<span class="prelude-ty">Option</span>&lt;i64&gt;&gt;, F5: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F6: Into&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;&gt;, F7: Into&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt;, F8: Into&lt;<span class="prelude-ty">Option</span>&lt;bool&gt;&gt; {
     Statistics {
       max: max.into(),
       min: min.into(),
@@ -5794,6 +5888,8 @@
       distinct_count: distinct_count.into(),
       max_value: max_value.into(),
       min_value: min_value.into(),
+      is_max_value_exact: is_max_value_exact.into(),
+      is_min_value_exact: is_min_value_exact.into(),
     }
   }
 }
@@ -5807,6 +5903,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>f_4: <span class="prelude-ty">Option</span>&lt;i64&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>f_5: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; = <span class="prelude-val">None</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>f_6: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>f_7: <span class="prelude-ty">Option</span>&lt;bool&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>f_8: <span class="prelude-ty">Option</span>&lt;bool&gt; = <span class="prelude-val">None</span>;
     <span class="kw">loop </span>{
       <span class="kw">let </span>field_ident = i_prot.read_field_begin()<span class="question-mark">?</span>;
       <span class="kw">if </span>field_ident.field_type == TType::Stop {
@@ -5838,6 +5936,14 @@
           <span class="kw">let </span>val = i_prot.read_bytes()<span class="question-mark">?</span>;
           f_6 = <span class="prelude-val">Some</span>(val);
         },
+        <span class="number">7 </span>=&gt; {
+          <span class="kw">let </span>val = i_prot.read_bool()<span class="question-mark">?</span>;
+          f_7 = <span class="prelude-val">Some</span>(val);
+        },
+        <span class="number">8 </span>=&gt; {
+          <span class="kw">let </span>val = i_prot.read_bool()<span class="question-mark">?</span>;
+          f_8 = <span class="prelude-val">Some</span>(val);
+        },
         <span class="kw">_ </span>=&gt; {
           i_prot.skip(field_ident.field_type)<span class="question-mark">?</span>;
         },
@@ -5852,6 +5958,8 @@
       distinct_count: f_4,
       max_value: f_5,
       min_value: f_6,
+      is_max_value_exact: f_7,
+      is_min_value_exact: f_8,
     };
     <span class="prelude-val">Ok</span>(ret)
   }
@@ -5886,6 +5994,16 @@
     <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>fld_var) = <span class="self">self</span>.min_value {
       o_prot.write_field_begin(<span class="kw-2">&amp;</span>TFieldIdentifier::new(<span class="string">&quot;min_value&quot;</span>, TType::String, <span class="number">6</span>))<span class="question-mark">?</span>;
       o_prot.write_bytes(fld_var)<span class="question-mark">?</span>;
+      o_prot.write_field_end()<span class="question-mark">?
+    </span>}
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(fld_var) = <span class="self">self</span>.is_max_value_exact {
+      o_prot.write_field_begin(<span class="kw-2">&amp;</span>TFieldIdentifier::new(<span class="string">&quot;is_max_value_exact&quot;</span>, TType::Bool, <span class="number">7</span>))<span class="question-mark">?</span>;
+      o_prot.write_bool(fld_var)<span class="question-mark">?</span>;
+      o_prot.write_field_end()<span class="question-mark">?
+    </span>}
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(fld_var) = <span class="self">self</span>.is_min_value_exact {
+      o_prot.write_field_begin(<span class="kw-2">&amp;</span>TFieldIdentifier::new(<span class="string">&quot;is_min_value_exact&quot;</span>, TType::Bool, <span class="number">8</span>))<span class="question-mark">?</span>;
+      o_prot.write_bool(fld_var)<span class="question-mark">?</span>;
       o_prot.write_field_end()<span class="question-mark">?
     </span>}
     o_prot.write_field_stop()<span class="question-mark">?</span>;
@@ -6110,6 +6228,43 @@
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
     <span class="kw">let </span>struct_ident = TStructIdentifier::new(<span class="string">&quot;DateType&quot;</span>);
+    o_prot.write_struct_begin(<span class="kw-2">&amp;</span>struct_ident)<span class="question-mark">?</span>;
+    o_prot.write_field_stop()<span class="question-mark">?</span>;
+    o_prot.write_struct_end()
+  }
+}
+
+<span class="comment">//
+// Float16Type
+//
+
+</span><span class="attr">#[derive(Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Float16Type {
+}
+
+<span class="kw">impl </span>Float16Type {
+  <span class="kw">pub fn </span>new() -&gt; Float16Type {
+    Float16Type {}
+  }
+}
+
+<span class="kw">impl </span><span class="kw">crate</span>::thrift::TSerializable <span class="kw">for </span>Float16Type {
+  <span class="kw">fn </span>read_from_in_protocol&lt;T: TInputProtocol&gt;(i_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;Float16Type&gt; {
+    i_prot.read_struct_begin()<span class="question-mark">?</span>;
+    <span class="kw">loop </span>{
+      <span class="kw">let </span>field_ident = i_prot.read_field_begin()<span class="question-mark">?</span>;
+      <span class="kw">if </span>field_ident.field_type == TType::Stop {
+        <span class="kw">break</span>;
+      }
+      i_prot.skip(field_ident.field_type)<span class="question-mark">?</span>;
+      i_prot.read_field_end()<span class="question-mark">?</span>;
+    }
+    i_prot.read_struct_end()<span class="question-mark">?</span>;
+    <span class="kw">let </span>ret = Float16Type {};
+    <span class="prelude-val">Ok</span>(ret)
+  }
+  <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
+    <span class="kw">let </span>struct_ident = TStructIdentifier::new(<span class="string">&quot;Float16Type&quot;</span>);
     o_prot.write_struct_begin(<span class="kw-2">&amp;</span>struct_ident)<span class="question-mark">?</span>;
     o_prot.write_field_stop()<span class="question-mark">?</span>;
     o_prot.write_struct_end()
@@ -6760,6 +6915,7 @@
   JSON(JsonType),
   BSON(BsonType),
   UUID(UUIDType),
+  FLOAT16(Float16Type),
 }
 
 <span class="kw">impl </span><span class="kw">crate</span>::thrift::TSerializable <span class="kw">for </span>LogicalType {
@@ -6865,6 +7021,13 @@
           }
           received_field_count += <span class="number">1</span>;
         },
+        <span class="number">15 </span>=&gt; {
+          <span class="kw">let </span>val = Float16Type::read_from_in_protocol(i_prot)<span class="question-mark">?</span>;
+          <span class="kw">if </span>ret.is_none() {
+            ret = <span class="prelude-val">Some</span>(LogicalType::FLOAT16(val));
+          }
+          received_field_count += <span class="number">1</span>;
+        },
         <span class="kw">_ </span>=&gt; {
           i_prot.skip(field_ident.field_type)<span class="question-mark">?</span>;
           received_field_count += <span class="number">1</span>;
@@ -6961,6 +7124,11 @@
       },
       LogicalType::UUID(<span class="kw-2">ref </span>f) =&gt; {
         o_prot.write_field_begin(<span class="kw-2">&amp;</span>TFieldIdentifier::new(<span class="string">&quot;UUID&quot;</span>, TType::Struct, <span class="number">14</span>))<span class="question-mark">?</span>;
+        f.write_to_out_protocol(o_prot)<span class="question-mark">?</span>;
+        o_prot.write_field_end()<span class="question-mark">?</span>;
+      },
+      LogicalType::FLOAT16(<span class="kw-2">ref </span>f) =&gt; {
+        o_prot.write_field_begin(<span class="kw-2">&amp;</span>TFieldIdentifier::new(<span class="string">&quot;FLOAT16&quot;</span>, TType::Struct, <span class="number">15</span>))<span class="question-mark">?</span>;
         f.write_to_out_protocol(o_prot)<span class="question-mark">?</span>;
         o_prot.write_field_end()<span class="question-mark">?</span>;
       },

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/record_reader/definition_levels.rs`."><title>definition_levels.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (aa1a71e9e 2023-10-26)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5f34af1a0ee6bacd.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/record_reader/definition_levels.rs`."><title>definition_levels.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -484,6 +484,7 @@
 <span class="kw">use </span>arrow_array::builder::BooleanBufferBuilder;
 <span class="kw">use </span>arrow_buffer::bit_chunk_iterator::UnalignedBitChunk;
 <span class="kw">use </span>arrow_buffer::Buffer;
+<span class="kw">use </span>bytes::Bytes;
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::bit_util::count_set_bits;
 <span class="kw">use </span><span class="kw">crate</span>::basic::Encoding;
@@ -492,7 +493,6 @@
 };
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::ColumnDescPtr;
-<span class="kw">use </span><span class="kw">crate</span>::util::memory::ByteBufferPtr;
 
 <span class="kw">use </span><span class="kw">super</span>::buffer::ScalarBuffer;
 
@@ -616,7 +616,7 @@
 <span class="kw">impl </span>ColumnLevelDecoder <span class="kw">for </span>DefinitionLevelBufferDecoder {
     <span class="kw">type </span>Slice = DefinitionLevelBuffer;
 
-    <span class="kw">fn </span>set_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, encoding: Encoding, data: ByteBufferPtr) {
+    <span class="kw">fn </span>set_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, encoding: Encoding, data: Bytes) {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.decoder {
             MaybePacked::Packed(d) =&gt; d.set_data(encoding, data),
             MaybePacked::Fallback(d) =&gt; d.set_data(encoding, data),
@@ -683,7 +683,7 @@
 /// [RLE]: https://github.com/apache/parquet-format/blob/master/Encodings.md#run-length-encoding--bit-packing-hybrid-rle--3
 /// [BIT_PACKED]: https://github.com/apache/parquet-format/blob/master/Encodings.md#bit-packed-deprecated-bit_packed--4
 </span><span class="kw">struct </span>PackedDecoder {
-    data: ByteBufferPtr,
+    data: Bytes,
     data_offset: usize,
     rle_left: usize,
     rle_value: bool,
@@ -742,7 +742,7 @@
 <span class="kw">impl </span>PackedDecoder {
     <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            data: ByteBufferPtr::new(<span class="macro">vec!</span>[]),
+            data: Bytes::from(<span class="macro">vec!</span>[]),
             data_offset: <span class="number">0</span>,
             rle_left: <span class="number">0</span>,
             rle_value: <span class="bool-val">false</span>,
@@ -751,7 +751,7 @@
         }
     }
 
-    <span class="kw">fn </span>set_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, encoding: Encoding, data: ByteBufferPtr) {
+    <span class="kw">fn </span>set_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, encoding: Encoding, data: Bytes) {
         <span class="self">self</span>.rle_left = <span class="number">0</span>;
         <span class="self">self</span>.rle_value = <span class="bool-val">false</span>;
         <span class="self">self</span>.packed_offset = <span class="number">0</span>;
@@ -849,7 +849,7 @@
 
         <span class="kw">let </span>encoded = encoder.consume();
         <span class="kw">let </span><span class="kw-2">mut </span>decoder = PackedDecoder::new();
-        decoder.set_data(Encoding::RLE, ByteBufferPtr::new(encoded));
+        decoder.set_data(Encoding::RLE, encoded.into());
 
         <span class="comment">// Decode data in random length intervals
         </span><span class="kw">let </span><span class="kw-2">mut </span>decoded = BooleanBufferBuilder::new(len);
@@ -888,7 +888,7 @@
 
         <span class="kw">let </span>encoded = encoder.consume();
         <span class="kw">let </span><span class="kw-2">mut </span>decoder = PackedDecoder::new();
-        decoder.set_data(Encoding::RLE, ByteBufferPtr::new(encoded));
+        decoder.set_data(Encoding::RLE, encoded.into());
 
         <span class="kw">let </span><span class="kw-2">mut </span>skip_value = <span class="number">0</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>read_value = <span class="number">0</span>;
