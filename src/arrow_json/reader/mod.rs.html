@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (4cb3beec8 2023-11-18)" data-channel="nightly" data-search-js="search-83dad86cfc406332.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/reader/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (f5dc2653f 2023-11-25)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f06f02fd918e3bb3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2260,6 +2260,47 @@
 <a href="#2260" id="2260">2260</a>
 <a href="#2261" id="2261">2261</a>
 <a href="#2262" id="2262">2262</a>
+<a href="#2263" id="2263">2263</a>
+<a href="#2264" id="2264">2264</a>
+<a href="#2265" id="2265">2265</a>
+<a href="#2266" id="2266">2266</a>
+<a href="#2267" id="2267">2267</a>
+<a href="#2268" id="2268">2268</a>
+<a href="#2269" id="2269">2269</a>
+<a href="#2270" id="2270">2270</a>
+<a href="#2271" id="2271">2271</a>
+<a href="#2272" id="2272">2272</a>
+<a href="#2273" id="2273">2273</a>
+<a href="#2274" id="2274">2274</a>
+<a href="#2275" id="2275">2275</a>
+<a href="#2276" id="2276">2276</a>
+<a href="#2277" id="2277">2277</a>
+<a href="#2278" id="2278">2278</a>
+<a href="#2279" id="2279">2279</a>
+<a href="#2280" id="2280">2280</a>
+<a href="#2281" id="2281">2281</a>
+<a href="#2282" id="2282">2282</a>
+<a href="#2283" id="2283">2283</a>
+<a href="#2284" id="2284">2284</a>
+<a href="#2285" id="2285">2285</a>
+<a href="#2286" id="2286">2286</a>
+<a href="#2287" id="2287">2287</a>
+<a href="#2288" id="2288">2288</a>
+<a href="#2289" id="2289">2289</a>
+<a href="#2290" id="2290">2290</a>
+<a href="#2291" id="2291">2291</a>
+<a href="#2292" id="2292">2292</a>
+<a href="#2293" id="2293">2293</a>
+<a href="#2294" id="2294">2294</a>
+<a href="#2295" id="2295">2295</a>
+<a href="#2296" id="2296">2296</a>
+<a href="#2297" id="2297">2297</a>
+<a href="#2298" id="2298">2298</a>
+<a href="#2299" id="2299">2299</a>
+<a href="#2300" id="2300">2300</a>
+<a href="#2301" id="2301">2301</a>
+<a href="#2302" id="2302">2302</a>
+<a href="#2303" id="2303">2303</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2979,7 +3020,9 @@
 
     <span class="kw">use </span>arrow_array::cast::AsArray;
     <span class="kw">use </span>arrow_array::types::Int32Type;
-    <span class="kw">use </span>arrow_array::{make_array, Array, BooleanArray, ListArray, StringArray, StructArray};
+    <span class="kw">use </span>arrow_array::{
+        make_array, Array, BooleanArray, Float64Array, ListArray, StringArray, StructArray,
+    };
     <span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
     <span class="kw">use </span>arrow_cast::display::{ArrayFormatter, FormatOptions};
     <span class="kw">use </span>arrow_data::ArrayDataBuilder;
@@ -4520,6 +4563,45 @@
             .as_primitive::&lt;TimestampMicrosecondType&gt;()
             .values();
         <span class="macro">assert_eq!</span>(values, <span class="kw-2">&amp;</span>[<span class="number">1699148028689</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_coercing_primitive_into_string_decoder() {
+        <span class="kw">let </span>buf = <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            <span class="string">r#&quot;[{{&quot;a&quot;: 1, &quot;b&quot;: &quot;A&quot;, &quot;c&quot;: &quot;T&quot;}}, {{&quot;a&quot;: 2, &quot;b&quot;: &quot;BB&quot;, &quot;c&quot;: &quot;F&quot;}}, {{&quot;a&quot;: {}, &quot;b&quot;: 123, &quot;c&quot;: false}}, {{&quot;a&quot;: {}, &quot;b&quot;: 789, &quot;c&quot;: true}}]&quot;#</span>,
+            (std::i32::MAX <span class="kw">as </span>i64 + <span class="number">10</span>),
+            std::i64::MAX - <span class="number">10
+        </span>);
+        <span class="kw">let </span>schema = Schema::new(<span class="macro">vec!</span>[
+            Field::new(<span class="string">&quot;a&quot;</span>, DataType::Float64, <span class="bool-val">true</span>),
+            Field::new(<span class="string">&quot;b&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>),
+            Field::new(<span class="string">&quot;c&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>),
+        ]);
+        <span class="kw">let </span>json_array: Vec&lt;serde_json::Value&gt; = serde_json::from_str(buf).unwrap();
+        <span class="kw">let </span>schema_ref = Arc::new(schema);
+
+        <span class="comment">// read record batches
+        </span><span class="kw">let </span>reader = ReaderBuilder::new(schema_ref.clone()).with_coerce_primitive(<span class="bool-val">true</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = reader.build_decoder().unwrap();
+        decoder.serialize(json_array.as_slice()).unwrap();
+        <span class="kw">let </span>batch = decoder.flush().unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(
+            batch,
+            RecordBatch::try_new(
+                schema_ref,
+                <span class="macro">vec!</span>[
+                    Arc::new(Float64Array::from(<span class="macro">vec!</span>[
+                        <span class="number">1.0</span>,
+                        <span class="number">2.0</span>,
+                        (std::i32::MAX <span class="kw">as </span>i64 + <span class="number">10</span>) <span class="kw">as </span>f64,
+                        (std::i64::MAX - <span class="number">10</span>) <span class="kw">as </span>f64
+                    ])),
+                    Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;A&quot;</span>, <span class="string">&quot;BB&quot;</span>, <span class="string">&quot;123&quot;</span>, <span class="string">&quot;789&quot;</span>])),
+                    Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;T&quot;</span>, <span class="string">&quot;F&quot;</span>, <span class="string">&quot;false&quot;</span>, <span class="string">&quot;true&quot;</span>])),
+                ]
+            )
+            .unwrap()
+        );
     }
 }
 </code></pre></div></section></main></body></html>
