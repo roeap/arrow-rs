@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["BufferQueue","ValuesBuffer"]};
+window.SIDEBAR_ITEMS = {"trait":["ValuesBuffer"]};

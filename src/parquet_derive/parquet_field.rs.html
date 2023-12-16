@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet_derive/src/parquet_field.rs`."><title>parquet_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (06e02d5b2 2023-12-09)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet_derive/src/parquet_field.rs`."><title>parquet_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="parquet_derive" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a96d57bdb 2023-12-15)" data-channel="nightly" data-search-js="search-874d56868bf05518.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1402,34 +1403,6 @@
 <a href="#1402" id="1402">1402</a>
 <a href="#1403" id="1403">1403</a>
 <a href="#1404" id="1404">1404</a>
-<a href="#1405" id="1405">1405</a>
-<a href="#1406" id="1406">1406</a>
-<a href="#1407" id="1407">1407</a>
-<a href="#1408" id="1408">1408</a>
-<a href="#1409" id="1409">1409</a>
-<a href="#1410" id="1410">1410</a>
-<a href="#1411" id="1411">1411</a>
-<a href="#1412" id="1412">1412</a>
-<a href="#1413" id="1413">1413</a>
-<a href="#1414" id="1414">1414</a>
-<a href="#1415" id="1415">1415</a>
-<a href="#1416" id="1416">1416</a>
-<a href="#1417" id="1417">1417</a>
-<a href="#1418" id="1418">1418</a>
-<a href="#1419" id="1419">1419</a>
-<a href="#1420" id="1420">1420</a>
-<a href="#1421" id="1421">1421</a>
-<a href="#1422" id="1422">1422</a>
-<a href="#1423" id="1423">1423</a>
-<a href="#1424" id="1424">1424</a>
-<a href="#1425" id="1425">1425</a>
-<a href="#1426" id="1426">1426</a>
-<a href="#1427" id="1427">1427</a>
-<a href="#1428" id="1428">1428</a>
-<a href="#1429" id="1429">1429</a>
-<a href="#1430" id="1430">1430</a>
-<a href="#1431" id="1431">1431</a>
-<a href="#1432" id="1432">1432</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1675,15 +1648,12 @@
     </span><span class="kw">pub fn </span>reader_snippet(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; proc_macro2::TokenStream {
         <span class="kw">let </span>ident = <span class="kw-2">&amp;</span><span class="self">self</span>.ident;
         <span class="kw">let </span>column_reader = <span class="self">self</span>.ty.column_reader();
-        <span class="kw">let </span>parquet_type = <span class="self">self</span>.ty.physical_type_as_rust();
 
         <span class="comment">// generate the code to read the column into a vector `vals`
         </span><span class="kw">let </span>write_batch_expr = <span class="macro">quote! </span>{
-            <span class="kw">let </span><span class="kw-2">mut </span>vals_vec = Vec::new();
-            vals_vec.resize(num_records, Default::default());
-            <span class="kw">let </span><span class="kw-2">mut </span>vals: <span class="kw-2">&amp;mut </span>[#parquet_type] = vals_vec.as_mut_slice();
+            <span class="kw">let </span><span class="kw-2">mut </span>vals = Vec::new();
             <span class="kw">if let </span>#column_reader(<span class="kw-2">mut </span>typed) = column_reader {
-                typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, vals)<span class="question-mark">?</span>;
+                typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>vals)<span class="question-mark">?</span>;
             } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">"Schema and struct disagree on type for {}"</span>, <span class="macro">stringify!</span>{#ident});
             }
@@ -2078,23 +2048,6 @@
         }
     }
 
-    <span class="kw">fn </span>physical_type_as_rust(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; proc_macro2::TokenStream {
-        <span class="kw">use </span>parquet::basic::Type <span class="kw">as </span>BasicType;
-
-        <span class="kw">match </span><span class="self">self</span>.physical_type() {
-            BasicType::BOOLEAN =&gt; <span class="macro">quote! </span>{ bool },
-            BasicType::INT32 =&gt; <span class="macro">quote! </span>{ i32 },
-            BasicType::INT64 =&gt; <span class="macro">quote! </span>{ i64 },
-            BasicType::INT96 =&gt; <span class="macro">unimplemented!</span>(<span class="string">"96-bit int currently is not supported"</span>),
-            BasicType::FLOAT =&gt; <span class="macro">quote! </span>{ f32 },
-            BasicType::DOUBLE =&gt; <span class="macro">quote! </span>{ f64 },
-            BasicType::BYTE_ARRAY =&gt; <span class="macro">quote! </span>{ ::parquet::data_type::ByteArray },
-            BasicType::FIXED_LEN_BYTE_ARRAY =&gt; {
-                <span class="macro">quote! </span>{ ::parquet::data_type::FixedLenByteArray }
-            }
-        }
-    }
-
     <span class="kw">fn </span>logical_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; proc_macro2::TokenStream {
         <span class="kw">let </span>last_part = <span class="self">self</span>.last_part();
         <span class="kw">let </span>leaf_type = <span class="self">self</span>.leaf_type_recursive();
@@ -2309,11 +2262,9 @@
             snippet,
             (<span class="macro">quote! </span>{
                  {
-                     <span class="kw">let </span><span class="kw-2">mut </span>vals_vec = Vec::new();
-                     vals_vec.resize(num_records, Default::default());
-                     <span class="kw">let </span><span class="kw-2">mut </span>vals: <span class="kw-2">&amp;mut</span>[i64] = vals_vec.as_mut_slice();
+                     <span class="kw">let </span><span class="kw-2">mut </span>vals = Vec::new();
                      <span class="kw">if let </span>ColumnReader::Int64ColumnReader(<span class="kw-2">mut </span>typed) = column_reader {
-                         typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, vals)<span class="question-mark">?</span>;
+                         typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>vals)<span class="question-mark">?</span>;
                      } <span class="kw">else </span>{
                          <span class="macro">panic!</span>(<span class="string">"Schema and struct disagree on type for {}"</span>, <span class="macro">stringify!</span>{ counter });
                      }
@@ -2688,11 +2639,9 @@
         <span class="kw">let </span>when = Field::from(<span class="kw-2">&amp;</span>fields[<span class="number">0</span>]);
         <span class="macro">assert_eq!</span>(when.reader_snippet().to_string(),(<span class="macro">quote!</span>{
             {
-                <span class="kw">let </span><span class="kw-2">mut </span>vals_vec = Vec::new();
-                vals_vec.resize(num_records, Default::default());
-                <span class="kw">let </span><span class="kw-2">mut </span>vals: <span class="kw-2">&amp;mut</span>[i64] = vals_vec.as_mut_slice();
+                <span class="kw">let </span><span class="kw-2">mut </span>vals = Vec::new();
                 <span class="kw">if let </span>ColumnReader::Int64ColumnReader(<span class="kw-2">mut </span>typed) = column_reader {
-                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, vals)<span class="question-mark">?</span>;
+                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>vals)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     <span class="macro">panic!</span>(<span class="string">"Schema and struct disagree on type for {}"</span>, <span class="macro">stringify!</span>{ henceforth });
                 }
@@ -2758,11 +2707,9 @@
         <span class="kw">let </span>when = Field::from(<span class="kw-2">&amp;</span>fields[<span class="number">0</span>]);
         <span class="macro">assert_eq!</span>(when.reader_snippet().to_string(),(<span class="macro">quote!</span>{
             {
-                <span class="kw">let </span><span class="kw-2">mut </span>vals_vec = Vec::new();
-                vals_vec.resize(num_records, Default::default());
-                <span class="kw">let </span><span class="kw-2">mut </span>vals: <span class="kw-2">&amp;mut </span>[i32] = vals_vec.as_mut_slice();
+                <span class="kw">let </span><span class="kw-2">mut </span>vals = Vec::new();
                 <span class="kw">if let </span>ColumnReader::Int32ColumnReader(<span class="kw-2">mut </span>typed) = column_reader {
-                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, vals)<span class="question-mark">?</span>;
+                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>vals)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     <span class="macro">panic!</span>(<span class="string">"Schema and struct disagree on type for {}"</span>, <span class="macro">stringify!</span>{ henceforth });
                 }
@@ -2828,11 +2775,9 @@
         <span class="kw">let </span>when = Field::from(<span class="kw-2">&amp;</span>fields[<span class="number">0</span>]);
         <span class="macro">assert_eq!</span>(when.reader_snippet().to_string(),(<span class="macro">quote!</span>{
             {
-                <span class="kw">let </span><span class="kw-2">mut </span>vals_vec = Vec::new();
-                vals_vec.resize(num_records, Default::default());
-                <span class="kw">let </span><span class="kw-2">mut </span>vals: <span class="kw-2">&amp;mut </span>[::parquet::data_type::ByteArray] = vals_vec.as_mut_slice();
+                <span class="kw">let </span><span class="kw-2">mut </span>vals = Vec::new();
                 <span class="kw">if let </span>ColumnReader::ByteArrayColumnReader(<span class="kw-2">mut </span>typed) = column_reader {
-                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, vals)<span class="question-mark">?</span>;
+                    typed.read_records(num_records, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>vals)<span class="question-mark">?</span>;
                 } <span class="kw">else </span>{
                     <span class="macro">panic!</span>(<span class="string">"Schema and struct disagree on type for {}"</span>, <span class="macro">stringify!</span>{ unique_id });
                 }
