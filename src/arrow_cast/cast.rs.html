@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (a96d57bdb 2023-12-15)" data-channel="nightly" data-search-js="search-874d56868bf05518.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (d6d7a9386 2023-12-22)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -9449,6 +9449,159 @@
 <a href="#9448" id="9448">9448</a>
 <a href="#9449" id="9449">9449</a>
 <a href="#9450" id="9450">9450</a>
+<a href="#9451" id="9451">9451</a>
+<a href="#9452" id="9452">9452</a>
+<a href="#9453" id="9453">9453</a>
+<a href="#9454" id="9454">9454</a>
+<a href="#9455" id="9455">9455</a>
+<a href="#9456" id="9456">9456</a>
+<a href="#9457" id="9457">9457</a>
+<a href="#9458" id="9458">9458</a>
+<a href="#9459" id="9459">9459</a>
+<a href="#9460" id="9460">9460</a>
+<a href="#9461" id="9461">9461</a>
+<a href="#9462" id="9462">9462</a>
+<a href="#9463" id="9463">9463</a>
+<a href="#9464" id="9464">9464</a>
+<a href="#9465" id="9465">9465</a>
+<a href="#9466" id="9466">9466</a>
+<a href="#9467" id="9467">9467</a>
+<a href="#9468" id="9468">9468</a>
+<a href="#9469" id="9469">9469</a>
+<a href="#9470" id="9470">9470</a>
+<a href="#9471" id="9471">9471</a>
+<a href="#9472" id="9472">9472</a>
+<a href="#9473" id="9473">9473</a>
+<a href="#9474" id="9474">9474</a>
+<a href="#9475" id="9475">9475</a>
+<a href="#9476" id="9476">9476</a>
+<a href="#9477" id="9477">9477</a>
+<a href="#9478" id="9478">9478</a>
+<a href="#9479" id="9479">9479</a>
+<a href="#9480" id="9480">9480</a>
+<a href="#9481" id="9481">9481</a>
+<a href="#9482" id="9482">9482</a>
+<a href="#9483" id="9483">9483</a>
+<a href="#9484" id="9484">9484</a>
+<a href="#9485" id="9485">9485</a>
+<a href="#9486" id="9486">9486</a>
+<a href="#9487" id="9487">9487</a>
+<a href="#9488" id="9488">9488</a>
+<a href="#9489" id="9489">9489</a>
+<a href="#9490" id="9490">9490</a>
+<a href="#9491" id="9491">9491</a>
+<a href="#9492" id="9492">9492</a>
+<a href="#9493" id="9493">9493</a>
+<a href="#9494" id="9494">9494</a>
+<a href="#9495" id="9495">9495</a>
+<a href="#9496" id="9496">9496</a>
+<a href="#9497" id="9497">9497</a>
+<a href="#9498" id="9498">9498</a>
+<a href="#9499" id="9499">9499</a>
+<a href="#9500" id="9500">9500</a>
+<a href="#9501" id="9501">9501</a>
+<a href="#9502" id="9502">9502</a>
+<a href="#9503" id="9503">9503</a>
+<a href="#9504" id="9504">9504</a>
+<a href="#9505" id="9505">9505</a>
+<a href="#9506" id="9506">9506</a>
+<a href="#9507" id="9507">9507</a>
+<a href="#9508" id="9508">9508</a>
+<a href="#9509" id="9509">9509</a>
+<a href="#9510" id="9510">9510</a>
+<a href="#9511" id="9511">9511</a>
+<a href="#9512" id="9512">9512</a>
+<a href="#9513" id="9513">9513</a>
+<a href="#9514" id="9514">9514</a>
+<a href="#9515" id="9515">9515</a>
+<a href="#9516" id="9516">9516</a>
+<a href="#9517" id="9517">9517</a>
+<a href="#9518" id="9518">9518</a>
+<a href="#9519" id="9519">9519</a>
+<a href="#9520" id="9520">9520</a>
+<a href="#9521" id="9521">9521</a>
+<a href="#9522" id="9522">9522</a>
+<a href="#9523" id="9523">9523</a>
+<a href="#9524" id="9524">9524</a>
+<a href="#9525" id="9525">9525</a>
+<a href="#9526" id="9526">9526</a>
+<a href="#9527" id="9527">9527</a>
+<a href="#9528" id="9528">9528</a>
+<a href="#9529" id="9529">9529</a>
+<a href="#9530" id="9530">9530</a>
+<a href="#9531" id="9531">9531</a>
+<a href="#9532" id="9532">9532</a>
+<a href="#9533" id="9533">9533</a>
+<a href="#9534" id="9534">9534</a>
+<a href="#9535" id="9535">9535</a>
+<a href="#9536" id="9536">9536</a>
+<a href="#9537" id="9537">9537</a>
+<a href="#9538" id="9538">9538</a>
+<a href="#9539" id="9539">9539</a>
+<a href="#9540" id="9540">9540</a>
+<a href="#9541" id="9541">9541</a>
+<a href="#9542" id="9542">9542</a>
+<a href="#9543" id="9543">9543</a>
+<a href="#9544" id="9544">9544</a>
+<a href="#9545" id="9545">9545</a>
+<a href="#9546" id="9546">9546</a>
+<a href="#9547" id="9547">9547</a>
+<a href="#9548" id="9548">9548</a>
+<a href="#9549" id="9549">9549</a>
+<a href="#9550" id="9550">9550</a>
+<a href="#9551" id="9551">9551</a>
+<a href="#9552" id="9552">9552</a>
+<a href="#9553" id="9553">9553</a>
+<a href="#9554" id="9554">9554</a>
+<a href="#9555" id="9555">9555</a>
+<a href="#9556" id="9556">9556</a>
+<a href="#9557" id="9557">9557</a>
+<a href="#9558" id="9558">9558</a>
+<a href="#9559" id="9559">9559</a>
+<a href="#9560" id="9560">9560</a>
+<a href="#9561" id="9561">9561</a>
+<a href="#9562" id="9562">9562</a>
+<a href="#9563" id="9563">9563</a>
+<a href="#9564" id="9564">9564</a>
+<a href="#9565" id="9565">9565</a>
+<a href="#9566" id="9566">9566</a>
+<a href="#9567" id="9567">9567</a>
+<a href="#9568" id="9568">9568</a>
+<a href="#9569" id="9569">9569</a>
+<a href="#9570" id="9570">9570</a>
+<a href="#9571" id="9571">9571</a>
+<a href="#9572" id="9572">9572</a>
+<a href="#9573" id="9573">9573</a>
+<a href="#9574" id="9574">9574</a>
+<a href="#9575" id="9575">9575</a>
+<a href="#9576" id="9576">9576</a>
+<a href="#9577" id="9577">9577</a>
+<a href="#9578" id="9578">9578</a>
+<a href="#9579" id="9579">9579</a>
+<a href="#9580" id="9580">9580</a>
+<a href="#9581" id="9581">9581</a>
+<a href="#9582" id="9582">9582</a>
+<a href="#9583" id="9583">9583</a>
+<a href="#9584" id="9584">9584</a>
+<a href="#9585" id="9585">9585</a>
+<a href="#9586" id="9586">9586</a>
+<a href="#9587" id="9587">9587</a>
+<a href="#9588" id="9588">9588</a>
+<a href="#9589" id="9589">9589</a>
+<a href="#9590" id="9590">9590</a>
+<a href="#9591" id="9591">9591</a>
+<a href="#9592" id="9592">9592</a>
+<a href="#9593" id="9593">9593</a>
+<a href="#9594" id="9594">9594</a>
+<a href="#9595" id="9595">9595</a>
+<a href="#9596" id="9596">9596</a>
+<a href="#9597" id="9597">9597</a>
+<a href="#9598" id="9598">9598</a>
+<a href="#9599" id="9599">9599</a>
+<a href="#9600" id="9600">9600</a>
+<a href="#9601" id="9601">9601</a>
+<a href="#9602" id="9602">9602</a>
+<a href="#9603" id="9603">9603</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9611,6 +9764,14 @@
         </span>(Decimal128(<span class="kw">_</span>, <span class="kw">_</span>) | Decimal256(<span class="kw">_</span>, <span class="kw">_</span>), Utf8 | LargeUtf8) =&gt; <span class="bool-val">true</span>,
         <span class="comment">// Utf8 to decimal
         </span>(Utf8 | LargeUtf8, Decimal128(<span class="kw">_</span>, <span class="kw">_</span>) | Decimal256(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+        (Struct(from_fields), Struct(to_fields)) =&gt; {
+            from_fields.len() == to_fields.len() &amp;&amp;
+                from_fields.iter().zip(to_fields.iter()).all(|(f1, f2)| {
+                    <span class="comment">// Assume that nullability between two structs are compatible, if not,
+                    // cast kernel will return error.
+                    </span>can_cast_types(f1.data_type(), f2.data_type())
+                })
+		}
         (Struct(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         (<span class="kw">_</span>, Struct(<span class="kw">_</span>)) =&gt; <span class="bool-val">false</span>,
         (<span class="kw">_</span>, Boolean) =&gt; {
@@ -10589,11 +10750,22 @@
                 </span>))),
             }
         }
+        (Struct(<span class="kw">_</span>), Struct(to_fields)) =&gt; {
+            <span class="kw">let </span>array = array.as_struct();
+            <span class="kw">let </span>fields = array
+                .columns()
+                .iter()
+                .zip(to_fields.iter())
+                .map(|(l, field)| cast_with_options(l, field.data_type(), cast_options))
+                .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;ArrayRef&gt;, ArrowError&gt;&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>array = StructArray::try_new(to_fields.clone(), fields, array.nulls().cloned())<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Arc::new(array) <span class="kw">as </span>ArrayRef)
+        }
         (Struct(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(
-            <span class="string">"Cannot cast from struct to other types"</span>.to_string(),
+            <span class="string">"Cannot cast from struct to other types except struct"</span>.to_string(),
         )),
         (<span class="kw">_</span>, Struct(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(
-            <span class="string">"Cannot cast to struct from other types"</span>.to_string(),
+            <span class="string">"Cannot cast to struct from other types except struct"</span>.to_string(),
         )),
         (<span class="kw">_</span>, Boolean) =&gt; <span class="kw">match </span>from_type {
             UInt8 =&gt; cast_numeric_to_bool::&lt;UInt8Type&gt;(array),
@@ -18897,6 +19069,140 @@
                 <span class="string">"Parser error: Invalid timezone \"ZZTOP\": only offset based timezones supported without chrono-tz feature"
             </span>);
         }
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_struct_to_struct() {
+        <span class="kw">let </span>struct_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Boolean, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Int32, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="kw">let </span>boolean = Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="kw">let </span>int = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">42</span>, <span class="number">28</span>, <span class="number">19</span>, <span class="number">31</span>]));
+        <span class="kw">let </span>struct_array = StructArray::from(<span class="macro">vec!</span>[
+            (
+                Arc::new(Field::new(<span class="string">"b"</span>, DataType::Boolean, <span class="bool-val">false</span>)),
+                boolean.clone() <span class="kw">as </span>ArrayRef,
+            ),
+            (
+                Arc::new(Field::new(<span class="string">"c"</span>, DataType::Int32, <span class="bool-val">false</span>)),
+                int.clone() <span class="kw">as </span>ArrayRef,
+            ),
+        ]);
+        <span class="kw">let </span>casted_array = cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type).unwrap();
+        <span class="kw">let </span>casted_array = casted_array.as_struct();
+        <span class="macro">assert_eq!</span>(casted_array.data_type(), <span class="kw-2">&amp;</span>to_type);
+        <span class="kw">let </span>casted_boolean_array = casted_array
+            .column(<span class="number">0</span>)
+            .as_string::&lt;i32&gt;()
+            .into_iter()
+            .flatten()
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">let </span>casted_int_array = casted_array
+            .column(<span class="number">1</span>)
+            .as_string::&lt;i32&gt;()
+            .into_iter()
+            .flatten()
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="macro">assert_eq!</span>(casted_boolean_array, <span class="macro">vec!</span>[<span class="string">"false"</span>, <span class="string">"false"</span>, <span class="string">"true"</span>, <span class="string">"true"</span>]);
+        <span class="macro">assert_eq!</span>(casted_int_array, <span class="macro">vec!</span>[<span class="string">"42"</span>, <span class="string">"28"</span>, <span class="string">"19"</span>, <span class="string">"31"</span>]);
+
+        <span class="comment">// test for can't cast
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Date32, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="macro">assert!</span>(!can_cast_types(<span class="kw-2">&amp;</span>struct_type, <span class="kw-2">&amp;</span>to_type));
+        <span class="kw">let </span>result = cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type);
+        <span class="macro">assert_eq!</span>(
+            <span class="string">"Cast error: Casting from Boolean to Date32 not supported"</span>,
+            result.unwrap_err().to_string()
+        );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_struct_to_struct_nullability() {
+        <span class="kw">let </span>boolean = Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="kw">let </span>int = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">42</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">19</span>), <span class="prelude-val">None</span>]));
+        <span class="kw">let </span>struct_array = StructArray::from(<span class="macro">vec!</span>[
+            (
+                Arc::new(Field::new(<span class="string">"b"</span>, DataType::Boolean, <span class="bool-val">false</span>)),
+                boolean.clone() <span class="kw">as </span>ArrayRef,
+            ),
+            (
+                Arc::new(Field::new(<span class="string">"c"</span>, DataType::Int32, <span class="bool-val">true</span>)),
+                int.clone() <span class="kw">as </span>ArrayRef,
+            ),
+        ]);
+
+        <span class="comment">// okay: nullable to nullable
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">true</span>),
+            ]
+            .into(),
+        );
+        cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type).expect(<span class="string">"Cast nullable to nullable struct field should work"</span>);
+
+        <span class="comment">// error: nullable to non-nullable
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type)
+            .expect_err(<span class="string">"Cast nullable to non-nullable struct field should fail"</span>);
+
+        <span class="kw">let </span>boolean = Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="kw">let </span>int = Arc::new(Int32Array::from(<span class="macro">vec!</span>[i32::MAX, <span class="number">25</span>, <span class="number">1</span>, <span class="number">100</span>]));
+        <span class="kw">let </span>struct_array = StructArray::from(<span class="macro">vec!</span>[
+            (
+                Arc::new(Field::new(<span class="string">"b"</span>, DataType::Boolean, <span class="bool-val">false</span>)),
+                boolean.clone() <span class="kw">as </span>ArrayRef,
+            ),
+            (
+                Arc::new(Field::new(<span class="string">"c"</span>, DataType::Int32, <span class="bool-val">false</span>)),
+                int.clone() <span class="kw">as </span>ArrayRef,
+            ),
+        ]);
+
+        <span class="comment">// okay: non-nullable to non-nullable
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type)
+            .expect(<span class="string">"Cast non-nullable to non-nullable struct field should work"</span>);
+
+        <span class="comment">// err: non-nullable to non-nullable but overflowing return null during casting
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Int8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type).expect_err(
+            <span class="string">"Cast non-nullable to non-nullable struct field returning null should fail"</span>,
+        );
     }
 }
 </code></pre></div></section></main></body></html>
