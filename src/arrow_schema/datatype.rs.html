@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-schema/src/datatype.rs`."><title>datatype.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_schema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (d6d7a9386 2023-12-22)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-schema/src/datatype.rs`."><title>datatype.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-bf502f66ec635d5d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_schema" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (e51e98dde 2023-12-31)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../arrow_schema/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -895,6 +896,16 @@
 <a href="#894" id="894">894</a>
 <a href="#895" id="895">895</a>
 <a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -920,14 +931,18 @@
 <span class="doccomment">/// The set of datatypes that are supported by this implementation of Apache Arrow.
 ///
 /// The Arrow specification on data types includes some more types.
-/// See also [`Schema.fbs`](https://github.com/apache/arrow/blob/master/format/Schema.fbs)
+/// See also [`Schema.fbs`](https://github.com/apache/arrow/blob/main/format/Schema.fbs)
 /// for Arrow's specification.
 ///
 /// The variants of this enum include primitive fixed size types as well as parametric or
 /// nested types.
-/// Currently the Rust implementation supports the following  nested types:
+/// Currently the Rust implementation supports the following nested types:
 ///  - `List&lt;T&gt;`
+///  - `LargeList&lt;T&gt;`
+///  - `FixedSizeList&lt;T&gt;`
 ///  - `Struct&lt;T, U, V, ...&gt;`
+///  - `Union&lt;T, U, V, ...&gt;`
+///  - `Map&lt;K, V&gt;`
 ///
 /// Nested types can themselves be nested within other arrays.
 /// For more information on these types please see
@@ -965,7 +980,7 @@
     ///
     /// Time is measured as a Unix epoch, counting the seconds from
     /// 00:00:00.000 on 1 January 1970, excluding leap seconds,
-    /// as a 64-bit integer.
+    /// as a signed 64-bit integer.
     ///
     /// The time zone is a string indicating the name of a time zone, one of:
     ///
@@ -1037,15 +1052,17 @@
     /// DataType::Timestamp(TimeUnit::Second, Some("string".to_string().into()));
     /// ```
     </span>Timestamp(TimeUnit, <span class="prelude-ty">Option</span>&lt;Arc&lt;str&gt;&gt;),
-    <span class="doccomment">/// A 32-bit date representing the elapsed time since UNIX epoch (1970-01-01)
+    <span class="doccomment">/// A signed 32-bit date representing the elapsed time since UNIX epoch (1970-01-01)
     /// in days (32 bits).
     </span>Date32,
-    <span class="doccomment">/// A 64-bit date representing the elapsed time since UNIX epoch (1970-01-01)
+    <span class="doccomment">/// A signed 64-bit date representing the elapsed time since UNIX epoch (1970-01-01)
     /// in milliseconds (64 bits). Values are evenly divisible by 86400000.
     </span>Date64,
-    <span class="doccomment">/// A 32-bit time representing the elapsed time since midnight in the unit of `TimeUnit`.
+    <span class="doccomment">/// A signed 32-bit time representing the elapsed time since midnight in the unit of `TimeUnit`.
+    /// Must be either seconds or milliseconds.
     </span>Time32(TimeUnit),
-    <span class="doccomment">/// A 64-bit time representing the elapsed time since midnight in the unit of `TimeUnit`.
+    <span class="doccomment">/// A signed 64-bit time representing the elapsed time since midnight in the unit of `TimeUnit`.
+    /// Must be either microseconds or nanoseconds.
     </span>Time64(TimeUnit),
     <span class="doccomment">/// Measure of elapsed time in either seconds, milliseconds, microseconds or nanoseconds.
     </span>Duration(TimeUnit),
@@ -1056,7 +1073,7 @@
     <span class="doccomment">/// Opaque binary data of variable length.
     ///
     /// A single Binary array can store up to [`i32::MAX`] bytes
-    /// of binary data in total
+    /// of binary data in total.
     </span>Binary,
     <span class="doccomment">/// Opaque binary data of fixed size.
     /// Enum parameter specifies the number of bytes per value.
@@ -1064,27 +1081,27 @@
     <span class="doccomment">/// Opaque binary data of variable length and 64-bit offsets.
     ///
     /// A single LargeBinary array can store up to [`i64::MAX`] bytes
-    /// of binary data in total
+    /// of binary data in total.
     </span>LargeBinary,
-    <span class="doccomment">/// A variable-length string in Unicode with UTF-8 encoding
+    <span class="doccomment">/// A variable-length string in Unicode with UTF-8 encoding.
     ///
     /// A single Utf8 array can store up to [`i32::MAX`] bytes
-    /// of string data in total
+    /// of string data in total.
     </span>Utf8,
     <span class="doccomment">/// A variable-length string in Unicode with UFT-8 encoding and 64-bit offsets.
     ///
     /// A single LargeUtf8 array can store up to [`i64::MAX`] bytes
-    /// of string data in total
+    /// of string data in total.
     </span>LargeUtf8,
     <span class="doccomment">/// A list of some logical data type with variable length.
     ///
-    /// A single List array can store up to [`i32::MAX`] elements in total
+    /// A single List array can store up to [`i32::MAX`] elements in total.
     </span>List(FieldRef),
     <span class="doccomment">/// A list of some logical data type with fixed length.
     </span>FixedSizeList(FieldRef, i32),
     <span class="doccomment">/// A list of some logical data type with variable length and 64-bit offsets.
     ///
-    /// A single LargeList array can store up to [`i64::MAX`] elements in total
+    /// A single LargeList array can store up to [`i64::MAX`] elements in total.
     </span>LargeList(FieldRef),
     <span class="doccomment">/// A nested datatype that contains a number of sub-fields.
     </span>Struct(Fields),
@@ -1470,9 +1487,13 @@
         }
     }
 
-    <span class="doccomment">/// Create a List DataType default name is "item"
+    <span class="doccomment">/// Create a [`DataType::List`] with elements of the specified type
+    /// and nullability, and conventionally named inner [`Field`] (`"item"`).
+    ///
+    /// To specify field level metadata, construct the inner [`Field`]
+    /// directly via [`Field::new`] or [`Field::new_list_field`].
     </span><span class="kw">pub fn </span>new_list(data_type: DataType, nullable: bool) -&gt; <span class="self">Self </span>{
-        DataType::List(Arc::new(Field::new(<span class="string">"item"</span>, data_type, nullable)))
+        DataType::List(Arc::new(Field::new_list_field(data_type, nullable)))
     }
 }
 

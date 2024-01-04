@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/record/reader.rs`."><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-804b98a1284a310a.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (d6d7a9386 2023-12-22)" data-channel="nightly" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-39ed315d46fb705f.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><div class="sidebar-resizer"></div>
-    <main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/record/reader.rs`."><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-bf502f66ec635d5d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (e51e98dde 2023-12-31)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+            <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
+    <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../parquet/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1693,14 +1694,6 @@
 <a href="#1692" id="1692">1692</a>
 <a href="#1693" id="1693">1693</a>
 <a href="#1694" id="1694">1694</a>
-<a href="#1695" id="1695">1695</a>
-<a href="#1696" id="1696">1696</a>
-<a href="#1697" id="1697">1697</a>
-<a href="#1698" id="1698">1698</a>
-<a href="#1699" id="1699">1699</a>
-<a href="#1700" id="1700">1700</a>
-<a href="#1701" id="1701">1701</a>
-<a href="#1702" id="1702">1702</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1802,10 +1795,7 @@
         row_group_reader: <span class="kw-2">&amp;</span><span class="kw">dyn </span>RowGroupReader,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;ReaderIter&gt; {
         <span class="kw">let </span>num_records = row_group_reader.metadata().num_rows() <span class="kw">as </span>usize;
-        <span class="prelude-val">Ok</span>(ReaderIter::new(
-            <span class="self">self</span>.build(descr, row_group_reader)<span class="question-mark">?</span>,
-            num_records,
-        ))
+        ReaderIter::new(<span class="self">self</span>.build(descr, row_group_reader)<span class="question-mark">?</span>, num_records)
     }
 
     <span class="doccomment">/// Builds tree of readers for the current schema recursively.
@@ -2114,7 +2104,7 @@
                 <span class="kw">if </span>reader.current_def_level() &gt; def_level {
                     reader.read_field()<span class="question-mark">?
                 </span>} <span class="kw">else </span>{
-                    reader.advance_columns();
+                    reader.advance_columns()<span class="question-mark">?</span>;
                     Field::Null
                 }
             }
@@ -2126,7 +2116,7 @@
                     {
                         fields.push((String::from(reader.field_name()), reader.read_field()<span class="question-mark">?</span>));
                     } <span class="kw">else </span>{
-                        reader.advance_columns();
+                        reader.advance_columns()<span class="question-mark">?</span>;
                         fields.push((String::from(reader.field_name()), Field::Null));
                     }
                 }
@@ -2139,7 +2129,7 @@
                     <span class="kw">if </span>reader.current_def_level() &gt; def_level {
                         elements.push(reader.read_field()<span class="question-mark">?</span>);
                     } <span class="kw">else </span>{
-                        reader.advance_columns();
+                        reader.advance_columns()<span class="question-mark">?</span>;
                         <span class="comment">// If the current definition level is equal to the definition
                         // level of this repeated type, then the
                         // result is an empty list and the repetition level
@@ -2162,8 +2152,8 @@
                     <span class="kw">if </span>keys.current_def_level() &gt; def_level {
                         pairs.push((keys.read_field()<span class="question-mark">?</span>, values.read_field()<span class="question-mark">?</span>));
                     } <span class="kw">else </span>{
-                        keys.advance_columns();
-                        values.advance_columns();
+                        keys.advance_columns()<span class="question-mark">?</span>;
+                        values.advance_columns()<span class="question-mark">?</span>;
                         <span class="comment">// If the current definition level is equal to the definition
                         // level of this repeated type, then the
                         // result is an empty list and the repetition level
@@ -2256,25 +2246,20 @@
     }
 
     <span class="doccomment">/// Advances leaf columns for the current reader.
-    </span><span class="kw">fn </span>advance_columns(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    </span><span class="kw">fn </span>advance_columns(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-            Reader::PrimitiveReader(<span class="kw">_</span>, <span class="kw-2">ref mut </span>column) =&gt; {
-                column.read_next().unwrap();
-            }
-            Reader::OptionReader(<span class="kw">_</span>, <span class="kw-2">ref mut </span>reader) =&gt; {
-                reader.advance_columns();
-            }
+            Reader::PrimitiveReader(<span class="kw">_</span>, <span class="kw-2">ref mut </span>column) =&gt; column.read_next().map(|<span class="kw">_</span>| ()),
+            Reader::OptionReader(<span class="kw">_</span>, <span class="kw-2">ref mut </span>reader) =&gt; reader.advance_columns(),
             Reader::GroupReader(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref mut </span>readers) =&gt; {
                 <span class="kw">for </span>reader <span class="kw">in </span>readers {
-                    reader.advance_columns();
+                    reader.advance_columns()<span class="question-mark">?</span>;
                 }
+                <span class="prelude-val">Ok</span>(())
             }
-            Reader::RepeatedReader(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref mut </span>reader) =&gt; {
-                reader.advance_columns();
-            }
+            Reader::RepeatedReader(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref mut </span>reader) =&gt; reader.advance_columns(),
             Reader::KeyValueReader(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref mut </span>keys, <span class="kw-2">ref mut </span>values) =&gt; {
-                keys.advance_columns();
-                values.advance_columns();
+                keys.advance_columns()<span class="question-mark">?</span>;
+                values.advance_columns()
             }
         }
     }
@@ -2487,13 +2472,13 @@
 }
 
 <span class="kw">impl </span>ReaderIter {
-    <span class="kw">fn </span>new(<span class="kw-2">mut </span>root_reader: Reader, num_records: usize) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>new(<span class="kw-2">mut </span>root_reader: Reader, num_records: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="comment">// Prepare root reader by advancing all column vectors
-        </span>root_reader.advance_columns();
-        <span class="self">Self </span>{
+        </span>root_reader.advance_columns()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             root_reader,
             records_left: num_records,
-        }
+        })
     }
 }
 
