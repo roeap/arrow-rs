@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/arrow_writer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-bf502f66ec635d5d.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (e51e98dde 2023-12-31)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/arrow_writer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (6b4f1c5e7 2024-01-27)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../parquet/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2882,6 +2882,90 @@
 <a href="#2880" id="2880">2880</a>
 <a href="#2881" id="2881">2881</a>
 <a href="#2882" id="2882">2882</a>
+<a href="#2883" id="2883">2883</a>
+<a href="#2884" id="2884">2884</a>
+<a href="#2885" id="2885">2885</a>
+<a href="#2886" id="2886">2886</a>
+<a href="#2887" id="2887">2887</a>
+<a href="#2888" id="2888">2888</a>
+<a href="#2889" id="2889">2889</a>
+<a href="#2890" id="2890">2890</a>
+<a href="#2891" id="2891">2891</a>
+<a href="#2892" id="2892">2892</a>
+<a href="#2893" id="2893">2893</a>
+<a href="#2894" id="2894">2894</a>
+<a href="#2895" id="2895">2895</a>
+<a href="#2896" id="2896">2896</a>
+<a href="#2897" id="2897">2897</a>
+<a href="#2898" id="2898">2898</a>
+<a href="#2899" id="2899">2899</a>
+<a href="#2900" id="2900">2900</a>
+<a href="#2901" id="2901">2901</a>
+<a href="#2902" id="2902">2902</a>
+<a href="#2903" id="2903">2903</a>
+<a href="#2904" id="2904">2904</a>
+<a href="#2905" id="2905">2905</a>
+<a href="#2906" id="2906">2906</a>
+<a href="#2907" id="2907">2907</a>
+<a href="#2908" id="2908">2908</a>
+<a href="#2909" id="2909">2909</a>
+<a href="#2910" id="2910">2910</a>
+<a href="#2911" id="2911">2911</a>
+<a href="#2912" id="2912">2912</a>
+<a href="#2913" id="2913">2913</a>
+<a href="#2914" id="2914">2914</a>
+<a href="#2915" id="2915">2915</a>
+<a href="#2916" id="2916">2916</a>
+<a href="#2917" id="2917">2917</a>
+<a href="#2918" id="2918">2918</a>
+<a href="#2919" id="2919">2919</a>
+<a href="#2920" id="2920">2920</a>
+<a href="#2921" id="2921">2921</a>
+<a href="#2922" id="2922">2922</a>
+<a href="#2923" id="2923">2923</a>
+<a href="#2924" id="2924">2924</a>
+<a href="#2925" id="2925">2925</a>
+<a href="#2926" id="2926">2926</a>
+<a href="#2927" id="2927">2927</a>
+<a href="#2928" id="2928">2928</a>
+<a href="#2929" id="2929">2929</a>
+<a href="#2930" id="2930">2930</a>
+<a href="#2931" id="2931">2931</a>
+<a href="#2932" id="2932">2932</a>
+<a href="#2933" id="2933">2933</a>
+<a href="#2934" id="2934">2934</a>
+<a href="#2935" id="2935">2935</a>
+<a href="#2936" id="2936">2936</a>
+<a href="#2937" id="2937">2937</a>
+<a href="#2938" id="2938">2938</a>
+<a href="#2939" id="2939">2939</a>
+<a href="#2940" id="2940">2940</a>
+<a href="#2941" id="2941">2941</a>
+<a href="#2942" id="2942">2942</a>
+<a href="#2943" id="2943">2943</a>
+<a href="#2944" id="2944">2944</a>
+<a href="#2945" id="2945">2945</a>
+<a href="#2946" id="2946">2946</a>
+<a href="#2947" id="2947">2947</a>
+<a href="#2948" id="2948">2948</a>
+<a href="#2949" id="2949">2949</a>
+<a href="#2950" id="2950">2950</a>
+<a href="#2951" id="2951">2951</a>
+<a href="#2952" id="2952">2952</a>
+<a href="#2953" id="2953">2953</a>
+<a href="#2954" id="2954">2954</a>
+<a href="#2955" id="2955">2955</a>
+<a href="#2956" id="2956">2956</a>
+<a href="#2957" id="2957">2957</a>
+<a href="#2958" id="2958">2958</a>
+<a href="#2959" id="2959">2959</a>
+<a href="#2960" id="2960">2960</a>
+<a href="#2961" id="2961">2961</a>
+<a href="#2962" id="2962">2962</a>
+<a href="#2963" id="2963">2963</a>
+<a href="#2964" id="2964">2964</a>
+<a href="#2965" id="2965">2965</a>
+<a href="#2966" id="2966">2966</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3004,10 +3088,26 @@
         arrow_schema: SchemaRef,
         props: <span class="prelude-ty">Option</span>&lt;WriterProperties&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>options = ArrowWriterOptions::new().with_properties(props.unwrap_or_default());
+        <span class="self">Self</span>::try_new_with_options(writer, arrow_schema, options)
+    }
+
+    <span class="doccomment">/// Try to create a new Arrow writer with [`ArrowWriterOptions`].
+    ///
+    /// The writer will fail if:
+    ///  * a `SerializedFileWriter` cannot be created from the ParquetWriter
+    ///  * the Arrow schema contains unsupported datatypes such as Unions
+    </span><span class="kw">pub fn </span>try_new_with_options(
+        writer: W,
+        arrow_schema: SchemaRef,
+        options: ArrowWriterOptions,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>schema = arrow_to_parquet_schema(<span class="kw-2">&amp;</span>arrow_schema)<span class="question-mark">?</span>;
-        <span class="comment">// add serialized arrow schema
-        </span><span class="kw">let </span><span class="kw-2">mut </span>props = props.unwrap_or_default();
-        add_encoded_arrow_schema_to_metadata(<span class="kw-2">&amp;</span>arrow_schema, <span class="kw-2">&amp;mut </span>props);
+        <span class="kw">let </span><span class="kw-2">mut </span>props = options.properties;
+        <span class="kw">if </span>!options.skip_arrow_metadata {
+            <span class="comment">// add serialized arrow schema
+            </span>add_encoded_arrow_schema_to_metadata(<span class="kw-2">&amp;</span>arrow_schema, <span class="kw-2">&amp;mut </span>props);
+        }
 
         <span class="kw">let </span>max_row_group_size = props.max_row_group_size();
 
@@ -3126,6 +3226,38 @@
     <span class="kw">fn </span>close(<span class="self">self</span>) -&gt; std::result::Result&lt;(), ArrowError&gt; {
         <span class="self">self</span>.close()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="doccomment">/// Arrow-specific configuration settings for writing parquet files.
+///
+/// See [`ArrowWriter`] for how to configure the writer.
+</span><span class="attr">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub struct </span>ArrowWriterOptions {
+    properties: WriterProperties,
+    skip_arrow_metadata: bool,
+}
+
+<span class="kw">impl </span>ArrowWriterOptions {
+    <span class="doccomment">/// Creates a new [`ArrowWriterOptions`] with the default settings.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
+    }
+
+    <span class="doccomment">/// Sets the [`WriterProperties`] for writing parquet files.
+    </span><span class="kw">pub fn </span>with_properties(<span class="self">self</span>, properties: WriterProperties) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ properties, ..<span class="self">self </span>}
+    }
+
+    <span class="doccomment">/// Parquet files generated by the [`ArrowWriter`] contain embedded arrow schema
+    /// by default.
+    ///
+    /// Set `skip_arrow_metadata` to true, to skip encoding this.
+    </span><span class="kw">pub fn </span>with_skip_arrow_metadata(<span class="self">self</span>, skip_arrow_metadata: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            skip_arrow_metadata,
+            ..<span class="self">self
+        </span>}
     }
 }
 
@@ -3788,6 +3920,7 @@
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">use </span><span class="kw">crate</span>::arrow::arrow_reader::{ParquetRecordBatchReader, ParquetRecordBatchReaderBuilder};
+    <span class="kw">use </span><span class="kw">crate</span>::arrow::ARROW_SCHEMA_META_KEY;
     <span class="kw">use </span>arrow::datatypes::ToByteSlice;
     <span class="kw">use </span>arrow::datatypes::{DataType, Field, Schema, UInt32Type, UInt8Type};
     <span class="kw">use </span>arrow::error::Result <span class="kw">as </span>ArrowResult;
@@ -4463,6 +4596,9 @@
             | DataType::UInt32
             | DataType::UInt16
             | DataType::UInt8 =&gt; <span class="macro">vec!</span>[Encoding::PLAIN, Encoding::DELTA_BINARY_PACKED],
+            DataType::Float32 | DataType::Float64 =&gt; {
+                <span class="macro">vec!</span>[Encoding::PLAIN, Encoding::BYTE_STREAM_SPLIT]
+            }
             <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[Encoding::PLAIN],
         };
 
@@ -5762,6 +5898,38 @@
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(a_idx, Index::NONE), <span class="string">"{a_idx:?}"</span>);
         <span class="kw">let </span>b_idx = <span class="kw-2">&amp;</span>column_index[<span class="number">0</span>][<span class="number">1</span>];
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(b_idx, Index::NONE), <span class="string">"{b_idx:?}"</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_arrow_writer_skip_metadata() {
+        <span class="kw">let </span>batch_schema = Schema::new(<span class="macro">vec!</span>[Field::new(<span class="string">"int32"</span>, DataType::Int32, <span class="bool-val">false</span>)]);
+        <span class="kw">let </span>file_schema = Arc::new(batch_schema.clone());
+
+        <span class="kw">let </span>batch = RecordBatch::try_new(
+            Arc::new(batch_schema),
+            <span class="macro">vec!</span>[Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])) <span class="kw">as _</span>],
+        )
+        .unwrap();
+        <span class="kw">let </span>skip_options = ArrowWriterOptions::new().with_skip_arrow_metadata(<span class="bool-val">true</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Vec::with_capacity(<span class="number">1024</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>writer =
+            ArrowWriter::try_new_with_options(<span class="kw-2">&amp;mut </span>buf, file_schema.clone(), skip_options).unwrap();
+        writer.write(<span class="kw-2">&amp;</span>batch).unwrap();
+        writer.close().unwrap();
+
+        <span class="kw">let </span>bytes = Bytes::from(buf);
+        <span class="kw">let </span>reader_builder = ParquetRecordBatchReaderBuilder::try_new(bytes).unwrap();
+        <span class="macro">assert_eq!</span>(file_schema, <span class="kw-2">*</span>reader_builder.schema());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(key_value_metadata) = reader_builder
+            .metadata()
+            .file_metadata()
+            .key_value_metadata()
+        {
+            <span class="macro">assert!</span>(!key_value_metadata
+                .iter()
+                .any(|kv| kv.key.as_str() == ARROW_SCHEMA_META_KEY));
+        }
     }
 }
 </code></pre></div></section></main></body></html>

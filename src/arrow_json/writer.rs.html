@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/writer.rs`."><title>writer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-bf502f66ec635d5d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (e51e98dde 2023-12-31)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-json/src/writer.rs`."><title>writer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_json" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (6b4f1c5e7 2024-01-27)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../arrow_json/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -2006,6 +2006,18 @@
 <a href="#2004" id="2004">2004</a>
 <a href="#2005" id="2005">2005</a>
 <a href="#2006" id="2006">2006</a>
+<a href="#2007" id="2007">2007</a>
+<a href="#2008" id="2008">2008</a>
+<a href="#2009" id="2009">2009</a>
+<a href="#2010" id="2010">2010</a>
+<a href="#2011" id="2011">2011</a>
+<a href="#2012" id="2012">2012</a>
+<a href="#2013" id="2013">2013</a>
+<a href="#2014" id="2014">2014</a>
+<a href="#2015" id="2015">2015</a>
+<a href="#2016" id="2016">2016</a>
+<a href="#2017" id="2017">2017</a>
+<a href="#2018" id="2018">2018</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2027,28 +2039,6 @@
 //!
 //! This JSON writer converts Arrow [`RecordBatch`]es into arrays of
 //! JSON objects or JSON formatted byte streams.
-//!
-//! ## Writing JSON Objects
-//!
-//! To serialize [`RecordBatch`]es into array of
-//! [JSON](https://docs.serde.rs/serde_json/) objects, use
-//! [`record_batches_to_json_rows`]:
-//!
-//! ```
-//! # use std::sync::Arc;
-//! # use arrow_array::{Int32Array, RecordBatch};
-//! # use arrow_schema::{DataType, Field, Schema};
-//!
-//! let schema = Schema::new(vec![Field::new("a", DataType::Int32, false)]);
-//! let a = Int32Array::from(vec![1, 2, 3]);
-//! let batch = RecordBatch::try_new(Arc::new(schema), vec![Arc::new(a)]).unwrap();
-//!
-//! let json_rows = arrow_json::writer::record_batches_to_json_rows(&amp;[&amp;batch]).unwrap();
-//! assert_eq!(
-//!     serde_json::Value::Object(json_rows[1].clone()),
-//!     serde_json::json!({"a": 2}),
-//! );
-//! ```
 //!
 //! ## Writing JSON formatted byte streams
 //!
@@ -2105,7 +2095,9 @@
 //! In order to explicitly write null values for keys, configure a custom [`Writer`] by
 //! using a [`WriterBuilder`] to construct a [`Writer`].
 
-</span><span class="kw">use </span>std::iter;
+</span><span class="kw">mod </span>encoder;
+
+<span class="kw">use </span>std::iter;
 <span class="kw">use </span>std::{fmt::Debug, io::Write};
 
 <span class="kw">use </span>serde_json::map::Map <span class="kw">as </span>JsonMap;
@@ -2117,7 +2109,9 @@
 <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
 <span class="kw">use </span>arrow_schema::<span class="kw-2">*</span>;
 
+<span class="kw">use </span><span class="kw">crate</span>::writer::encoder::EncoderOptions;
 <span class="kw">use </span>arrow_cast::display::{ArrayFormatter, FormatOptions};
+<span class="kw">use </span>encoder::make_encoder;
 
 <span class="kw">fn </span>primitive_array_to_json&lt;T&gt;(array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Value&gt;, ArrowError&gt;
 <span class="kw">where
@@ -2489,6 +2483,7 @@
 
 <span class="doccomment">/// Converts an arrow [`RecordBatch`] into a `Vec` of Serde JSON
 /// [`JsonMap`]s (objects)
+</span><span class="attr">#[deprecated(note = <span class="string">"Use Writer"</span>)]
 </span><span class="kw">pub fn </span>record_batches_to_json_rows(
     batches: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>RecordBatch],
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;JsonMap&lt;String, Value&gt;&gt;, ArrowError&gt; {
@@ -2605,11 +2600,7 @@
 
 <span class="doccomment">/// JSON writer builder.
 </span><span class="attr">#[derive(Debug, Clone, Default)]
-</span><span class="kw">pub struct </span>WriterBuilder {
-    <span class="doccomment">/// Controls whether null values should be written explicitly for keys
-    /// in objects, or whether the key should be omitted entirely.
-    </span>explicit_nulls: bool,
-}
+</span><span class="kw">pub struct </span>WriterBuilder(EncoderOptions);
 
 <span class="kw">impl </span>WriterBuilder {
     <span class="doccomment">/// Create a new builder for configuring JSON writing options.
@@ -2637,7 +2628,7 @@
 
     <span class="doccomment">/// Returns `true` if this writer is configured to keep keys with null values.
     </span><span class="kw">pub fn </span>explicit_nulls(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.explicit_nulls
+        <span class="self">self</span>.<span class="number">0</span>.explicit_nulls
     }
 
     <span class="doccomment">/// Set whether to keep keys with null values, or to omit writing them.
@@ -2662,7 +2653,7 @@
     ///
     /// Default is to skip nulls (set to `false`).
     </span><span class="kw">pub fn </span>with_explicit_nulls(<span class="kw-2">mut </span><span class="self">self</span>, explicit_nulls: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.explicit_nulls = explicit_nulls;
+        <span class="self">self</span>.<span class="number">0</span>.explicit_nulls = explicit_nulls;
         <span class="self">self
     </span>}
 
@@ -2677,7 +2668,7 @@
             started: <span class="bool-val">false</span>,
             finished: <span class="bool-val">false</span>,
             format: F::default(),
-            explicit_nulls: <span class="self">self</span>.explicit_nulls,
+            options: <span class="self">self</span>.<span class="number">0</span>,
         }
     }
 }
@@ -2710,8 +2701,8 @@
     <span class="doccomment">/// Determines how the byte stream is formatted
     </span>format: F,
 
-    <span class="doccomment">/// Whether keys with null values should be written or skipped
-    </span>explicit_nulls: bool,
+    <span class="doccomment">/// Controls how JSON should be encoded, e.g. whether to write explicit nulls or skip them
+    </span>options: EncoderOptions,
 }
 
 <span class="kw">impl</span>&lt;W, F&gt; Writer&lt;W, F&gt;
@@ -2726,11 +2717,12 @@
             started: <span class="bool-val">false</span>,
             finished: <span class="bool-val">false</span>,
             format: F::default(),
-            explicit_nulls: <span class="bool-val">false</span>,
+            options: EncoderOptions::default(),
         }
     }
 
     <span class="doccomment">/// Write a single JSON row to the output writer
+    </span><span class="attr">#[deprecated(note = <span class="string">"Use Writer::write"</span>)]
     </span><span class="kw">pub fn </span>write_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>, row: <span class="kw-2">&amp;</span>Value) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
         <span class="kw">let </span>is_first_row = !<span class="self">self</span>.started;
         <span class="kw">if </span>!<span class="self">self</span>.started {
@@ -2746,18 +2738,48 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Convert the `RecordBatch` into JSON rows, and write them to the output
+    <span class="doccomment">/// Serialize `batch` to JSON output
     </span><span class="kw">pub fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: <span class="kw-2">&amp;</span>RecordBatch) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
-        <span class="kw">for </span>row <span class="kw">in </span>record_batches_to_json_rows_internal(<span class="kw-2">&amp;</span>[batch], <span class="self">self</span>.explicit_nulls)<span class="question-mark">? </span>{
-            <span class="self">self</span>.write_row(<span class="kw-2">&amp;</span>Value::Object(row))<span class="question-mark">?</span>;
+        <span class="kw">if </span>batch.num_rows() == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
+
+        <span class="comment">// BufWriter uses a buffer size of 8KB
+        // We therefore double this and flush once we have more than 8KB
+        </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = Vec::with_capacity(<span class="number">16 </span>* <span class="number">1024</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>is_first_row = !<span class="self">self</span>.started;
+        <span class="kw">if </span>!<span class="self">self</span>.started {
+            <span class="self">self</span>.format.start_stream(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+            <span class="self">self</span>.started = <span class="bool-val">true</span>;
+        }
+
+        <span class="kw">let </span>array = StructArray::from(batch.clone());
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = make_encoder(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span><span class="self">self</span>.options)<span class="question-mark">?</span>;
+
+        <span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..batch.num_rows() {
+            <span class="self">self</span>.format.start_row(<span class="kw-2">&amp;mut </span>buffer, is_first_row)<span class="question-mark">?</span>;
+            is_first_row = <span class="bool-val">false</span>;
+
+            encoder.encode(idx, <span class="kw-2">&amp;mut </span>buffer);
+            <span class="kw">if </span>buffer.len() &gt; <span class="number">8 </span>* <span class="number">1024 </span>{
+                <span class="self">self</span>.writer.write_all(<span class="kw-2">&amp;</span>buffer)<span class="question-mark">?</span>;
+                buffer.clear();
+            }
+            <span class="self">self</span>.format.end_row(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">if </span>!buffer.is_empty() {
+            <span class="self">self</span>.writer.write_all(<span class="kw-2">&amp;</span>buffer)<span class="question-mark">?</span>;
+        }
+
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Convert the [`RecordBatch`] into JSON rows, and write them to the output
+    <span class="doccomment">/// Serialize `batches` to JSON output
     </span><span class="kw">pub fn </span>write_batches(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batches: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>RecordBatch]) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
-        <span class="kw">for </span>row <span class="kw">in </span>record_batches_to_json_rows_internal(batches, <span class="self">self</span>.explicit_nulls)<span class="question-mark">? </span>{
-            <span class="self">self</span>.write_row(<span class="kw-2">&amp;</span>Value::Object(row))<span class="question-mark">?</span>;
+        <span class="kw">for </span>b <span class="kw">in </span>batches {
+            <span class="self">self</span>.write(b)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -3461,6 +3483,7 @@
     }
 
     <span class="attr">#[test]
+    #[allow(deprecated)]
     </span><span class="kw">fn </span>json_writer_one_row() {
         <span class="kw">let </span><span class="kw-2">mut </span>writer = ArrayWriter::new(<span class="macro">vec!</span>[] <span class="kw">as </span>Vec&lt;u8&gt;);
         <span class="kw">let </span>v = <span class="macro">json!</span>({ <span class="string">"an"</span>: <span class="string">"object" </span>});
@@ -3473,6 +3496,7 @@
     }
 
     <span class="attr">#[test]
+    #[allow(deprecated)]
     </span><span class="kw">fn </span>json_writer_two_rows() {
         <span class="kw">let </span><span class="kw-2">mut </span>writer = ArrayWriter::new(<span class="macro">vec!</span>[] <span class="kw">as </span>Vec&lt;u8&gt;);
         <span class="kw">let </span>v = <span class="macro">json!</span>({ <span class="string">"an"</span>: <span class="string">"object" </span>});
@@ -3572,9 +3596,9 @@
             <span class="string">r#"{"a":{"list":[1,2]},"b":{"list":[1,2]}}
 {"a":{"list":[null]},"b":{"list":[null]}}
 {"a":{"list":[]},"b":{"list":[]}}
-{"a":null,"b":{"list":[3,null]}}
+{"b":{"list":[3,null]}}
 {"a":{"list":[4,5]},"b":{"list":[4,5]}}
-{"a":null,"b":{}}
+{"b":{}}
 {"a":{},"b":{}}
 "#</span>,
         );
@@ -3629,7 +3653,7 @@
         assert_json_eq(
             <span class="kw-2">&amp;</span>buf,
             <span class="string">r#"{"map":{"foo":10}}
-{"map":null}
+{}
 {"map":{}}
 {"map":{"bar":20,"baz":30,"qux":40}}
 {"map":{"quux":50}}

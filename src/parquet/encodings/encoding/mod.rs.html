@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/encodings/encoding/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-bf502f66ec635d5d.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (e51e98dde 2023-12-31)" data-channel="nightly" data-search-js="search-c17e98913a53b3b7.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-0b2e2def73e61cbe.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/encodings/encoding/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-b1a3e7f8283b8434.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.77.0-nightly (6b4f1c5e7 2024-01-27)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../parquet/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -1125,6 +1125,22 @@
 <a href="#1123" id="1123">1123</a>
 <a href="#1124" id="1124">1124</a>
 <a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1156,6 +1172,7 @@
 <span class="kw">use </span>bytes::Bytes;
 <span class="kw">pub use </span>dict_encoder::DictEncoder;
 
+<span class="kw">mod </span>byte_stream_split_encoder;
 <span class="kw">mod </span>dict_encoder;
 
 <span class="comment">// ----------------------------------------------------------------------
@@ -1212,6 +1229,9 @@
         Encoding::DELTA_BINARY_PACKED =&gt; Box::new(DeltaBitPackEncoder::new()),
         Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; Box::new(DeltaLengthByteArrayEncoder::new()),
         Encoding::DELTA_BYTE_ARRAY =&gt; Box::new(DeltaByteArrayEncoder::new()),
+        Encoding::BYTE_STREAM_SPLIT =&gt; {
+            Box::new(byte_stream_split_encoder::ByteStreamSplitEncoder::new())
+        }
         e =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">nyi_err!</span>(<span class="string">"Encoding {} is not supported"</span>, e)),
     };
     <span class="prelude-val">Ok</span>(encoder)
@@ -1503,19 +1523,17 @@
             <span class="comment">// Compute the max delta in current mini block
             </span><span class="kw">let </span><span class="kw-2">mut </span>max_delta = i64::MIN;
             <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                max_delta =
-                    cmp::max(max_delta, <span class="self">self</span>.deltas[i * <span class="self">self</span>.mini_block_size + j]);
+                max_delta = cmp::max(max_delta, <span class="self">self</span>.deltas[i * <span class="self">self</span>.mini_block_size + j]);
             }
 
             <span class="comment">// Compute bit width to store (max_delta - min_delta)
-            </span><span class="kw">let </span>bit_width =
-                num_required_bits(<span class="self">self</span>.subtract_u64(max_delta, min_delta)) <span class="kw">as </span>usize;
+            </span><span class="kw">let </span>bit_width = num_required_bits(<span class="self">self</span>.subtract_u64(max_delta, min_delta)) <span class="kw">as </span>usize;
             <span class="self">self</span>.bit_writer.write_at(offset + i, bit_width <span class="kw">as </span>u8);
 
             <span class="comment">// Encode values in current mini block using min_delta and bit_width
             </span><span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..n {
-                <span class="kw">let </span>packed_value = <span class="self">self
-                    </span>.subtract_u64(<span class="self">self</span>.deltas[i * <span class="self">self</span>.mini_block_size + j], min_delta);
+                <span class="kw">let </span>packed_value =
+                    <span class="self">self</span>.subtract_u64(<span class="self">self</span>.deltas[i * <span class="self">self</span>.mini_block_size + j], min_delta);
                 <span class="self">self</span>.bit_writer.put_value(packed_value, bit_width);
             }
 
@@ -1699,8 +1717,7 @@
                 .map(|x| x.as_any().downcast_ref::&lt;ByteArray&gt;().unwrap())
         };
 
-        <span class="kw">let </span>lengths: Vec&lt;i32&gt; =
-            val_it().map(|byte_array| byte_array.len() <span class="kw">as </span>i32).collect();
+        <span class="kw">let </span>lengths: Vec&lt;i32&gt; = val_it().map(|byte_array| byte_array.len() <span class="kw">as </span>i32).collect();
         <span class="self">self</span>.len_encoder.put(<span class="kw-2">&amp;</span>lengths)<span class="question-mark">?</span>;
         <span class="kw">for </span>byte_array <span class="kw">in </span>val_it() {
             <span class="self">self</span>.encoded_size += byte_array.len();
@@ -1776,14 +1793,15 @@
         <span class="kw">let </span><span class="kw-2">mut </span>prefix_lengths: Vec&lt;i32&gt; = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>suffixes: Vec&lt;ByteArray&gt; = <span class="macro">vec!</span>[];
 
-        <span class="kw">let </span>values = values.iter()
+        <span class="kw">let </span>values = values
+            .iter()
             .map(|x| x.as_any())
             .map(|x| <span class="kw">match </span>T::get_physical_type() {
                 Type::BYTE_ARRAY =&gt; x.downcast_ref::&lt;ByteArray&gt;().unwrap(),
                 Type::FIXED_LEN_BYTE_ARRAY =&gt; x.downcast_ref::&lt;FixedLenByteArray&gt;().unwrap(),
                 <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(
                     <span class="string">"DeltaByteArrayEncoder only supports ByteArrayType and FixedLenByteArrayType"
-                </span>)
+                </span>),
             });
 
         <span class="kw">for </span>byte_array <span class="kw">in </span>values {
@@ -1792,8 +1810,7 @@
             // value
             </span><span class="kw">let </span>prefix_len = cmp::min(<span class="self">self</span>.previous.len(), current.len());
             <span class="kw">let </span><span class="kw-2">mut </span>match_len = <span class="number">0</span>;
-            <span class="kw">while </span>match_len &lt; prefix_len &amp;&amp; <span class="self">self</span>.previous[match_len] == current[match_len]
-            {
+            <span class="kw">while </span>match_len &lt; prefix_len &amp;&amp; <span class="self">self</span>.previous[match_len] == current[match_len] {
                 match_len += <span class="number">1</span>;
             }
             prefix_lengths.push(match_len <span class="kw">as </span>i32);
@@ -1851,9 +1868,7 @@
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">use </span><span class="kw">crate</span>::encodings::decoding::{get_decoder, Decoder, DictDecoder, PlainDecoder};
-    <span class="kw">use </span><span class="kw">crate</span>::schema::types::{
-        ColumnDescPtr, ColumnDescriptor, ColumnPath, Type <span class="kw">as </span>SchemaType,
-    };
+    <span class="kw">use </span><span class="kw">crate</span>::schema::types::{ColumnDescPtr, ColumnDescriptor, ColumnPath, Type <span class="kw">as </span>SchemaType};
     <span class="kw">use </span><span class="kw">crate</span>::util::test_common::rand_gen::{random_bytes, RandGen};
 
     <span class="kw">const </span>TEST_SET_SIZE: usize = <span class="number">1024</span>;
@@ -1919,12 +1934,14 @@
     </span><span class="kw">fn </span>test_float() {
         FloatType::test(Encoding::PLAIN, TEST_SET_SIZE, -<span class="number">1</span>);
         FloatType::test(Encoding::PLAIN_DICTIONARY, TEST_SET_SIZE, -<span class="number">1</span>);
+        FloatType::test(Encoding::BYTE_STREAM_SPLIT, TEST_SET_SIZE, -<span class="number">1</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_double() {
         DoubleType::test(Encoding::PLAIN, TEST_SET_SIZE, -<span class="number">1</span>);
         DoubleType::test(Encoding::PLAIN_DICTIONARY, TEST_SET_SIZE, -<span class="number">1</span>);
+        DoubleType::test(Encoding::BYTE_STREAM_SPLIT, TEST_SET_SIZE, -<span class="number">1</span>);
     }
 
     <span class="attr">#[test]
@@ -1944,11 +1961,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_dict_encoded_size() {
-        <span class="kw">fn </span>run_test&lt;T: DataType&gt;(
-            type_length: i32,
-            values: <span class="kw-2">&amp;</span>[T::T],
-            expected_size: usize,
-        ) {
+        <span class="kw">fn </span>run_test&lt;T: DataType&gt;(type_length: i32, values: <span class="kw-2">&amp;</span>[T::T], expected_size: usize) {
             <span class="kw">let </span><span class="kw-2">mut </span>encoder = create_test_dict_encoder::&lt;T&gt;(type_length);
             <span class="macro">assert_eq!</span>(encoder.dict_encoded_size(), <span class="number">0</span>);
             encoder.put(values).unwrap();
@@ -1970,11 +1983,7 @@
             <span class="kw-2">&amp;</span>[Int96::from(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]), Int96::from(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])],
             <span class="number">24</span>,
         );
-        run_test::&lt;ByteArrayType&gt;(
-            -<span class="number">1</span>,
-            <span class="kw-2">&amp;</span>[ByteArray::from(<span class="string">"abcd"</span>), ByteArray::from(<span class="string">"efj"</span>)],
-            <span class="number">15</span>,
-        );
+        run_test::&lt;ByteArrayType&gt;(-<span class="number">1</span>, <span class="kw-2">&amp;</span>[ByteArray::from(<span class="string">"abcd"</span>), ByteArray::from(<span class="string">"efj"</span>)], <span class="number">15</span>);
         run_test::&lt;FixedLenByteArrayType&gt;(
             <span class="number">2</span>,
             <span class="kw-2">&amp;</span>[ByteArray::from(<span class="string">"ab"</span>).into(), ByteArray::from(<span class="string">"bc"</span>).into()],
@@ -2043,15 +2052,45 @@
             <span class="number">3</span>, <span class="comment">// only suffix bytes, length encoder is not flushed yet
             </span><span class="number">0</span>,
         );
+
+        <span class="comment">// BYTE_STREAM_SPLIT
+        </span>run_test::&lt;FloatType&gt;(Encoding::BYTE_STREAM_SPLIT, -<span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="number">0.1</span>, <span class="number">0.2</span>], <span class="number">0</span>, <span class="number">8</span>, <span class="number">0</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_byte_stream_split_example_f32() {
+        <span class="comment">// Test data from https://github.com/apache/parquet-format/blob/2a481fe1aad64ff770e21734533bb7ef5a057dac/Encodings.md#byte-stream-split-byte_stream_split--9
+        </span><span class="kw">let </span><span class="kw-2">mut </span>encoder = create_test_encoder::&lt;FloatType&gt;(Encoding::BYTE_STREAM_SPLIT);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = create_test_decoder::&lt;FloatType&gt;(<span class="number">0</span>, Encoding::BYTE_STREAM_SPLIT);
+
+        <span class="kw">let </span>input = <span class="macro">vec!</span>[
+            f32::from_le_bytes([<span class="number">0xAA</span>, <span class="number">0xBB</span>, <span class="number">0xCC</span>, <span class="number">0xDD</span>]),
+            f32::from_le_bytes([<span class="number">0x00</span>, <span class="number">0x11</span>, <span class="number">0x22</span>, <span class="number">0x33</span>]),
+            f32::from_le_bytes([<span class="number">0xA3</span>, <span class="number">0xB4</span>, <span class="number">0xC5</span>, <span class="number">0xD6</span>]),
+        ];
+
+        encoder.put(<span class="kw-2">&amp;</span>input).unwrap();
+        <span class="kw">let </span>encoded = encoder.flush_buffer().unwrap();
+
+        <span class="macro">assert_eq!</span>(
+            encoded,
+            Bytes::from(<span class="macro">vec!</span>[
+                <span class="number">0xAA_u8</span>, <span class="number">0x00</span>, <span class="number">0xA3</span>, <span class="number">0xBB</span>, <span class="number">0x11</span>, <span class="number">0xB4</span>, <span class="number">0xCC</span>, <span class="number">0x22</span>, <span class="number">0xC5</span>, <span class="number">0xDD</span>, <span class="number">0x33</span>, <span class="number">0xD6
+            </span>])
+        );
+
+        <span class="kw">let </span><span class="kw-2">mut </span>decoded = <span class="macro">vec!</span>[<span class="number">0.0</span>; input.len()];
+        decoder.set_data(encoded, input.len()).unwrap();
+        decoder.get(<span class="kw-2">&amp;mut </span>decoded).unwrap();
+
+        <span class="macro">assert_eq!</span>(decoded, input);
     }
 
     <span class="comment">// See: https://github.com/sunchao/parquet-rs/issues/47
     </span><span class="attr">#[test]
     </span><span class="kw">fn </span>test_issue_47() {
-        <span class="kw">let </span><span class="kw-2">mut </span>encoder =
-            create_test_encoder::&lt;ByteArrayType&gt;(Encoding::DELTA_BYTE_ARRAY);
-        <span class="kw">let </span><span class="kw-2">mut </span>decoder =
-            create_test_decoder::&lt;ByteArrayType&gt;(<span class="number">0</span>, Encoding::DELTA_BYTE_ARRAY);
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = create_test_encoder::&lt;ByteArrayType&gt;(Encoding::DELTA_BYTE_ARRAY);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = create_test_decoder::&lt;ByteArrayType&gt;(<span class="number">0</span>, Encoding::DELTA_BYTE_ARRAY);
 
         <span class="kw">let </span>input = <span class="macro">vec!</span>[
             ByteArray::from(<span class="string">"aa"</span>),
@@ -2062,8 +2101,7 @@
 
         <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="macro">vec!</span>[ByteArray::default(); input.len()];
 
-        <span class="kw">let </span><span class="kw-2">mut </span>result =
-            put_and_get(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;mut </span>decoder, <span class="kw-2">&amp;</span>input[..<span class="number">2</span>], <span class="kw-2">&amp;mut </span>output[..<span class="number">2</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = put_and_get(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;mut </span>decoder, <span class="kw-2">&amp;</span>input[..<span class="number">2</span>], <span class="kw-2">&amp;mut </span>output[..<span class="number">2</span>]);
         <span class="macro">assert!</span>(
             result.is_ok(),
             <span class="string">"first put_and_get() failed with: {}"</span>,
@@ -2199,10 +2237,7 @@
         decoder.get(output)
     }
 
-    <span class="kw">fn </span>create_and_check_encoder&lt;T: DataType&gt;(
-        encoding: Encoding,
-        err: <span class="prelude-ty">Option</span>&lt;ParquetError&gt;,
-    ) {
+    <span class="kw">fn </span>create_and_check_encoder&lt;T: DataType&gt;(encoding: Encoding, err: <span class="prelude-ty">Option</span>&lt;ParquetError&gt;) {
         <span class="kw">let </span>encoder = get_encoder::&lt;T&gt;(encoding);
         <span class="kw">match </span>err {
             <span class="prelude-val">Some</span>(parquet_error) =&gt; {
@@ -2233,10 +2268,7 @@
         get_encoder(enc).unwrap()
     }
 
-    <span class="kw">fn </span>create_test_decoder&lt;T: DataType&gt;(
-        type_len: i32,
-        enc: Encoding,
-    ) -&gt; Box&lt;<span class="kw">dyn </span>Decoder&lt;T&gt;&gt; {
+    <span class="kw">fn </span>create_test_decoder&lt;T: DataType&gt;(type_len: i32, enc: Encoding) -&gt; Box&lt;<span class="kw">dyn </span>Decoder&lt;T&gt;&gt; {
         <span class="kw">let </span>desc = create_test_col_desc_ptr(type_len, T::get_physical_type());
         get_decoder(desc, enc).unwrap()
     }
