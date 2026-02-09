@@ -63,13 +63,13 @@ crc = { version = "3.0", optional = true }
 strum_macros = "0.27"
 uuid = "1.17"
 indexmap = "2.10"
-rand = "0.9"
+rand = "0.10"
 md5 = { version = "0.8", optional = true }
 sha2 = { version = "0.10", optional = true }
 
 [dev-dependencies]
 arrow-data = { workspace = true }
-rand = { version = "0.9.1", default-features = false, features = [
+rand = { version = "0.10.0", default-features = false, features = [
     "std",
     "std_rng",
     "thread_rng",
