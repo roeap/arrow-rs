@@ -100,7 +100,9 @@ sysinfo = { version = "0.38.1", default-features = false, features = ["system"] 
 all-features = true
 
 [features]
-default = ["arrow", "snap", "brotli", "flate2-zlib-rs", "lz4", "zstd", "base64", "simdutf8"]
+# wasm patch: zstd (C `zstd-sys`) and brotli dropped from defaults so the crate
+# builds for wasm32-unknown-unknown. Consumers that need them (native) opt back in.
+default = ["arrow", "snap", "flate2-zlib-rs", "lz4", "base64", "simdutf8"]
 # Enable lz4
 lz4 = ["lz4_flex"]
 # Enable arrow reader/writer APIs
