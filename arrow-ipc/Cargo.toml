@@ -43,11 +43,18 @@ arrow-schema = { workspace = true }
 arrow-select = { workspace = true}
 flatbuffers = { version = "25.2.10", default-features = false }
 lz4_flex = { version = "0.13", default-features = false, features = ["std", "frame"], optional = true }
+
+# zstd is C-backed (zstd-sys) and cannot build for wasm32-unknown-unknown, but
+# datafusion-common enables the `zstd` feature unconditionally. Gating the
+# dependency by target makes the feature inert on wasm: the codec falls back to
+# the graceful "requires the zstd feature" error instead of failing the build.
+[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
 zstd = { version = "0.13.0", default-features = false, optional = true }
 
 [features]
 default = []
 lz4 = ["lz4_flex"]
+zstd = ["dep:zstd"]
 
 [dev-dependencies]
 criterion = { workspace = true }

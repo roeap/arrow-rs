@@ -29,12 +29,18 @@ const LENGTH_OF_PREFIX_DATA: i64 = 8;
 /// compression.
 #[derive(Default)]
 pub struct CompressionContext {
-    #[cfg(feature = "zstd")]
+    #[cfg(all(
+        feature = "zstd",
+        not(all(target_arch = "wasm32", target_os = "unknown"))
+    ))]
     compressor: Option<zstd::bulk::Compressor<'static>>,
 }
 
 impl CompressionContext {
-    #[cfg(feature = "zstd")]
+    #[cfg(all(
+        feature = "zstd",
+        not(all(target_arch = "wasm32", target_os = "unknown"))
+    ))]
     fn zstd_compressor(&mut self) -> &mut zstd::bulk::Compressor<'static> {
         self.compressor.get_or_insert_with(|| {
             zstd::bulk::Compressor::new(zstd::DEFAULT_COMPRESSION_LEVEL)
@@ -47,7 +53,10 @@ impl std::fmt::Debug for CompressionContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut ds = f.debug_struct("CompressionContext");
 
-        #[cfg(feature = "zstd")]
+        #[cfg(all(
+            feature = "zstd",
+            not(all(target_arch = "wasm32", target_os = "unknown"))
+        ))]
         ds.field(
             "compressor",
             &self.compressor.as_ref().map(|_| "zstd::bulk::Compressor"),
@@ -63,7 +72,10 @@ impl std::fmt::Debug for CompressionContext {
 /// between subsequent decompression calls to avoid the performance overhead of initialising a new
 /// context for every decompression.
 pub struct DecompressionContext {
-    #[cfg(feature = "zstd")]
+    #[cfg(all(
+        feature = "zstd",
+        not(all(target_arch = "wasm32", target_os = "unknown"))
+    ))]
     decompressor: Option<zstd::bulk::Decompressor<'static>>,
 }
 
@@ -72,7 +84,10 @@ impl DecompressionContext {
         Default::default()
     }
 
-    #[cfg(feature = "zstd")]
+    #[cfg(all(
+        feature = "zstd",
+        not(all(target_arch = "wasm32", target_os = "unknown"))
+    ))]
     fn zstd_decompressor(&mut self) -> &mut zstd::bulk::Decompressor<'static> {
         self.decompressor.get_or_insert_with(|| {
             zstd::bulk::Decompressor::new().expect("can create zstd decompressor")
@@ -84,7 +99,10 @@ impl DecompressionContext {
 impl Default for DecompressionContext {
     fn default() -> Self {
         DecompressionContext {
-            #[cfg(feature = "zstd")]
+            #[cfg(all(
+                feature = "zstd",
+                not(all(target_arch = "wasm32", target_os = "unknown"))
+            ))]
             decompressor: None,
         }
     }
@@ -94,7 +112,10 @@ impl std::fmt::Debug for DecompressionContext {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut ds = f.debug_struct("DecompressionContext");
 
-        #[cfg(feature = "zstd")]
+        #[cfg(all(
+            feature = "zstd",
+            not(all(target_arch = "wasm32", target_os = "unknown"))
+        ))]
         ds.field(
             "decompressor",
             &self
@@ -274,7 +295,10 @@ fn decompress_lz4(_input: &[u8], _decompressed_size: usize) -> Result<Vec<u8>, A
     ))
 }
 
-#[cfg(feature = "zstd")]
+#[cfg(all(
+    feature = "zstd",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
 fn compress_zstd(
     input: &[u8],
     output: &mut Vec<u8>,
@@ -285,7 +309,10 @@ fn compress_zstd(
     Ok(())
 }
 
-#[cfg(not(feature = "zstd"))]
+#[cfg(not(all(
+    feature = "zstd",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+)))]
 #[allow(clippy::ptr_arg)]
 fn compress_zstd(
     _input: &[u8],
@@ -297,7 +324,10 @@ fn compress_zstd(
     ))
 }
 
-#[cfg(feature = "zstd")]
+#[cfg(all(
+    feature = "zstd",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
 fn decompress_zstd(
     input: &[u8],
     decompressed_size: usize,
@@ -309,7 +339,10 @@ fn decompress_zstd(
     Ok(output)
 }
 
-#[cfg(not(feature = "zstd"))]
+#[cfg(not(all(
+    feature = "zstd",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+)))]
 #[allow(clippy::ptr_arg)]
 fn decompress_zstd(
     _input: &[u8],
@@ -360,7 +393,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg(feature = "zstd")]
+    #[cfg(all(
+        feature = "zstd",
+        not(all(target_arch = "wasm32", target_os = "unknown"))
+    ))]
     fn test_zstd_compression() {
         let input_bytes = b"hello zstd";
         let codec = super::CompressionCodec::Zstd;
