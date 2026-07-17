@@ -58,7 +58,10 @@ brotli = { version = "8.0", default-features = false, features = ["std"], option
 # To use `flate2` you must enable either the `flate2-zlib-rs` or `flate2-rust_backened` backends
 flate2 = { version = "1.1", default-features = false, optional = true }
 lz4_flex = { version = "0.13", default-features = false, features = ["std", "frame"], optional = true }
-zstd = { version = "0.13", optional = true, default-features = false }
+# zstd backends are target-split (see the `zstd` feature note below): the C-backed `zstd`
+# crate on native (full encode + decode), and pure-Rust `ruzstd` on wasm (decode only, so
+# `zstd-sys`'s C toolchain is never required for wasm32-unknown-unknown). Both are pulled in by
+# the single `zstd` feature so consumers opt in the same way regardless of target.
 chrono = { workspace = true }
 num-bigint = { version = "0.4", default-features = false }
 num-integer = { version = "0.1.46", default-features = false, features = ["std"] }
@@ -78,6 +81,19 @@ crc32fast = { version = "1.4.2", optional = true, default-features = false }
 simdutf8 = { workspace = true , optional = true }
 ring = { version = "0.17", default-features = false, features = ["std"], optional = true }
 
+# zstd backend, split by target and unified under the single `zstd` feature.
+#
+# Native: the C-backed `zstd` crate (`zstd-sys`) — full encode + decode.
+[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
+zstd = { version = "0.13", optional = true, default-features = false }
+
+# wasm32-unknown-unknown: pure-Rust `ruzstd` — DECODE ONLY (its encoder is immature and unneeded;
+# nothing writes zstd parquet on wasm). This keeps `zstd-sys`'s C toolchain out of the wasm build
+# entirely, so a single fork can carry working zstd on both targets. The codec's `compress()` path
+# returns a graceful error on wasm (see `parquet/src/compression.rs`).
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+ruzstd = { version = "0.8", optional = true, default-features = false, features = ["std"] }
+
 [dev-dependencies]
 base64 = { version = "0.22", default-features = false, features = ["std"] }
 criterion = { workspace = true, default-features = false, features = ["async_futures"]  }
@@ -88,6 +104,9 @@ brotli = { version = "8.0", default-features = false, features = ["std"] }
 flate2 = { version = "1.0", default-features = false, features = ["rust_backend"] }
 lz4_flex = { version = "0.13", default-features = false, features = ["std", "frame"] }
 zstd = { version = "0.13", default-features = false }
+# Native dev-only: exercise the pure-Rust wasm decode path (`ruzstd`) against C-encoded zstd
+# frames, so the cross-codec compatibility the wasm build relies on is covered in normal CI.
+ruzstd = { version = "0.8", default-features = false, features = ["std"] }
 serde_json = { version = "1.0", features = ["std"], default-features = false }
 arrow = { workspace = true, features = ["ipc", "test_utils", "prettyprint", "json"] }
 arrow-cast = { workspace = true }
@@ -100,9 +119,11 @@ sysinfo = { version = "0.38.1", default-features = false, features = ["system"] 
 all-features = true
 
 [features]
-# wasm patch: zstd (C `zstd-sys`) and brotli dropped from defaults so the crate
-# builds for wasm32-unknown-unknown. Consumers that need them (native) opt back in.
-default = ["arrow", "snap", "flate2-zlib-rs", "lz4", "base64", "simdutf8"]
+# wasm patch: `brotli` dropped from defaults so the crate builds for
+# wasm32-unknown-unknown (it is pure-Rust but unneeded on wasm; native consumers opt back in).
+# `zstd` stays in defaults — it is now target-split (C on native, pure-Rust `ruzstd` decode on
+# wasm), so it no longer breaks the wasm build.
+default = ["arrow", "snap", "flate2-zlib-rs", "lz4", "zstd", "base64", "simdutf8"]
 # Enable lz4
 lz4 = ["lz4_flex"]
 # Enable arrow reader/writer APIs
@@ -121,8 +142,10 @@ experimental = ["variant_experimental"]
 async = ["futures", "tokio"]
 # Enable object_store integration
 object_store = ["dep:object_store", "async"]
-# Group Zstd dependencies
-zstd = ["dep:zstd"]
+# Zstd support. Backed by the C `zstd` crate on native and pure-Rust `ruzstd` on wasm; each
+# `dep:` is inert on the target where its dependency is gated out (see the target dependency
+# tables above), so enabling `zstd` does the right thing on both.
+zstd = ["dep:zstd", "dep:ruzstd"]
 # Verify 32-bit CRC checksum when decoding parquet pages
 crc = ["dep:crc32fast"]
 # Enable SIMD UTF-8 validation

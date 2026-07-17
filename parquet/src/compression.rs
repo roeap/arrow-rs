@@ -178,6 +178,9 @@ pub fn create_codec(codec: CodecType, _options: &CodecOptions) -> Result<Option<
             ))
         }
         CodecType::ZSTD(level) => {
+            // `ZSTDCodec` is defined per target: C-backed (encode + decode) on native, pure-Rust
+            // `ruzstd` (decode only) on wasm. Both expose `new(ZstdLevel)`, so the call site is
+            // identical; the level is ignored by the decode-only wasm codec.
             #[cfg(any(feature = "zstd", test))]
             return Ok(Some(Box::new(ZSTDCodec::new(level))));
             Err(ParquetError::General(
@@ -501,7 +504,13 @@ mod lz4_codec {
 #[cfg(all(feature = "experimental", any(feature = "lz4", test)))]
 pub use lz4_codec::*;
 
-#[cfg(any(feature = "zstd", test))]
+// zstd codec, split by target. Native uses the C-backed `zstd` crate (encode + decode); wasm uses
+// pure-Rust `ruzstd` (decode only). Both modules export a `ZSTDCodec` with an identical
+// `new(ZstdLevel)` constructor so the dispatch call site in `create_codec` is target-agnostic.
+#[cfg(all(
+    any(feature = "zstd", test),
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
 mod zstd_codec {
     use crate::compression::{Codec, ZstdLevel};
     use crate::errors::Result;
@@ -554,7 +563,76 @@ mod zstd_codec {
         }
     }
 }
-#[cfg(any(feature = "zstd", test))]
+#[cfg(all(
+    any(feature = "zstd", test),
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
+pub use zstd_codec::*;
+
+/// Pure-Rust zstd codec for `wasm32-unknown-unknown`: **decode only**.
+///
+/// The C-backed `zstd` crate (`zstd-sys`) is unavailable on wasm without a clang-wasm toolchain, so
+/// on wasm the `zstd` feature is backed by [`ruzstd`] instead. Parquet reads on wasm only ever
+/// decompress data pages; `compress` is unreachable there (nothing writes zstd parquet in the
+/// browser) and returns a graceful error rather than pulling an (immature) pure-Rust encoder.
+#[cfg(all(
+    feature = "zstd",
+    target_arch = "wasm32",
+    target_os = "unknown"
+))]
+mod zstd_codec {
+    use std::io::Read;
+
+    use crate::compression::{Codec, ZstdLevel};
+    use crate::errors::{ParquetError, Result};
+
+    /// zstd codec backed by the pure-Rust [`ruzstd`] decoder. Decode only (see module docs).
+    pub struct ZSTDCodec {}
+
+    impl ZSTDCodec {
+        /// Creates a new (decode-only) zstd codec. The compression `level` is irrelevant to
+        /// decoding and is accepted only to match the native codec's constructor signature.
+        pub(crate) fn new(_level: ZstdLevel) -> Self {
+            Self {}
+        }
+    }
+
+    impl Codec for ZSTDCodec {
+        fn decompress(
+            &mut self,
+            input_buf: &[u8],
+            output_buf: &mut Vec<u8>,
+            uncompress_size: Option<usize>,
+        ) -> Result<usize> {
+            // Parquet writes standard (RFC 8878) zstd frames; `ruzstd`'s streaming decoder reads
+            // the frame header and inflates the payload. Pre-reserve when the caller knows the
+            // uncompressed size (the page's `uncompressed_page_size`), matching the native path.
+            if let Some(n) = uncompress_size {
+                output_buf.reserve(n);
+            }
+            let start = output_buf.len();
+            let mut decoder = ruzstd::decoding::StreamingDecoder::new(input_buf)
+                .map_err(|e| ParquetError::External(Box::new(e)))?;
+            decoder
+                .read_to_end(output_buf)
+                .map_err(|e| ParquetError::External(Box::new(e)))?;
+            Ok(output_buf.len() - start)
+        }
+
+        fn compress(&mut self, _input_buf: &[u8], _output_buf: &mut Vec<u8>) -> Result<()> {
+            Err(ParquetError::General(
+                "zstd encoding is not supported on wasm32-unknown-unknown (decode-only ruzstd \
+                 backend)"
+                    .into(),
+            ))
+        }
+    }
+}
+#[cfg(all(
+    feature = "zstd",
+    target_arch = "wasm32",
+    target_os = "unknown"
+))]
 pub use zstd_codec::*;
 
 /// Represents a valid zstd compression level.
@@ -930,5 +1008,35 @@ mod tests {
     #[test]
     fn test_codec_lz4_raw() {
         test_codec_with_size(CodecType::LZ4_RAW);
+    }
+
+    /// Cross-codec check: a zstd frame produced by the C encoder must decode correctly with the
+    /// pure-Rust `ruzstd` decoder — the exact backend the wasm build uses (see the wasm
+    /// `zstd_codec` module). Runs natively so CI covers the wasm decode path's correctness without
+    /// a wasm runner. Mirrors the wasm codec's `decompress` logic (`StreamingDecoder` + read).
+    #[test]
+    fn test_zstd_c_encoded_decodes_with_ruzstd() {
+        use std::io::Read;
+
+        for level in [1, 3, 9, ZstdLevel::MAXIMUM_LEVEL] {
+            let level = ZstdLevel::try_new(level).unwrap();
+            let original: Vec<u8> = (0..4096u32).flat_map(|i| i.to_le_bytes()).collect();
+
+            // Encode with the C codec (the native path).
+            let mut c_codec = ZSTDCodec::new(level);
+            let mut compressed = Vec::new();
+            c_codec.compress(&original, &mut compressed).unwrap();
+
+            // Decode with pure-Rust ruzstd, exactly as the wasm codec does.
+            let mut decoded = Vec::new();
+            let mut decoder = ruzstd::decoding::StreamingDecoder::new(compressed.as_slice()).unwrap();
+            decoder.read_to_end(&mut decoded).unwrap();
+
+            assert_eq!(
+                decoded, original,
+                "ruzstd must byte-exactly decode a C-encoded zstd frame (level {})",
+                level.compression_level()
+            );
+        }
     }
 }
